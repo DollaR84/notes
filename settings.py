@@ -15,5 +15,5 @@ class Settings(WXDB):
 
     def __init__(self):
         """Initialization settings class."""
+        super().__init__(self.__class__.__name__.lower())
         self.name = 'notes'
-        super().__init__(self.name)
