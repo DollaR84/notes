@@ -48,6 +48,7 @@ class WXDB:
 
     def setup(self):
         """Create table in database."""
+        scripts = []
         script = '''CREATE TABLE window (
                     id INTEGER PRIMARY KEY NOT NULL,
                     px INTEGER NOT NULL,
@@ -55,7 +56,8 @@ class WXDB:
                     sx INTEGER NOT NULL,
                     sy INTEGER NOT NULL) WITHOUT ROWID
                  '''
-        self.db.put(script)
+        scripts.append(script)
         script = '''INSERT INTO window (id, px, py, sx, sy)
                     VALUES (1, 0, 0, 800, 600)'''
-        self.db.put(script)
+        scripts.append(script)
+        self.db.put(scripts)
