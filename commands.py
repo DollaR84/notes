@@ -7,8 +7,8 @@ Created on 25.05.2019
 
 """
 
-from dialogs import About
-from dialogs import Message
+from dialogs.dialogs import About
+from dialogs.dialogs import Message
 
 from settings import Settings
 
