@@ -7,6 +7,8 @@ Created on 25.05.2019
 
 """
 
+from dialogs.settings import SettingsDialog
+
 from wxdb import WXDB
 
 
