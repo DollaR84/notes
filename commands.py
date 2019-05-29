@@ -48,3 +48,31 @@ class Commands:
         self.settings.set_size(self.drawer.GetSize())
         self.settings.finish()
         self.drawer.Destroy()
+
+    def tree_select(self, event):
+        """Change select item in tree."""
+        pass
+
+    def text_change(self, event):
+        """Change text controls note."""
+        object = event.GetEventObject()
+
+    def save(self, event):
+        """Save note in database."""
+        pass
+
+    def delete(self, event):
+        """Delete note from database."""
+        pass
+
+    def create(self, event):
+        """Create new note."""
+        object = event.GetEventObject()
+
+    def count(self, event):
+        """Show information of count notes."""
+        object = event.GetEventObject()
+
+    def options(self, event):
+        """Run settings dialog."""
+        pass
