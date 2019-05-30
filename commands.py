@@ -10,7 +10,7 @@ Created on 25.05.2019
 from dialogs.dialogs import About
 from dialogs.dialogs import Message
 
-from settings import Settings
+from configs import Config
 
 
 class Commands:
@@ -20,14 +20,14 @@ class Commands:
         """Initialization commands class."""
         self.drawer = drawer
         self.message = Message(self.drawer)
-        self.settings = Settings()
+        self.config = Config()
 
         self.set_window()
 
     def set_window(self):
         """Set size and position window from saving data."""
-        self.drawer.SetPosition(self.settings.get_pos())
-        self.drawer.SetSize(self.settings.get_size())
+        self.drawer.SetPosition(self.config.get_pos())
+        self.drawer.SetSize(self.config.get_size())
         self.drawer.Layout()
 
     def about(self, event):
@@ -44,9 +44,9 @@ class Commands:
 
     def close_window(self, event):
         """Close window event."""
-        self.settings.set_pos(self.drawer.GetScreenPosition())
-        self.settings.set_size(self.drawer.GetSize())
-        self.settings.finish()
+        self.config.set_pos(self.drawer.GetScreenPosition())
+        self.config.set_size(self.drawer.GetSize())
+        self.config.finish()
         self.drawer.Destroy()
 
     def tree_select(self, event):
