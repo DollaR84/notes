@@ -75,4 +75,4 @@ class Commands:
 
     def options(self, event):
         """Run settings dialog."""
-        pass
+        self.config.open_settings(self.drawer)
