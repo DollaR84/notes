@@ -22,7 +22,7 @@ class WXDB:
         if not self.db.if_exists('window'):
             self.setup()
 
-    def finish(self):
+    def close(self):
         """Save finish program."""
         self.db.disconnect()
 
