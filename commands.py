@@ -7,6 +7,8 @@ Created on 25.05.2019
 
 """
 
+from api import Notes
+
 from dialogs.dialogs import About
 from dialogs.dialogs import Message
 
@@ -21,6 +23,7 @@ class Commands:
         self.drawer = drawer
         self.message = Message(self.drawer)
         self.config = Config()
+        self.notes = Notes(self.config)
 
         self.set_window()
 
@@ -46,7 +49,8 @@ class Commands:
         """Close window event."""
         self.config.set_pos(self.drawer.GetScreenPosition())
         self.config.set_size(self.drawer.GetSize())
-        self.config.finish()
+        self.config.close()
+        self.notes.close()
         self.drawer.Destroy()
 
     def tree_select(self, event):
