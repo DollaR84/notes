@@ -20,7 +20,7 @@ class WXDB:
 
         self.db.connect(self.db_name + '.db')
         if not self.db.if_exists('window'):
-            self.setup()
+            self.setup_wxdb()
 
     def close(self):
         """Save finish program."""
@@ -46,7 +46,7 @@ class WXDB:
         script = 'UPDATE window SET sx=%d, sy=%d WHERE id=1' % tuple(size)
         self.db.put(script)
 
-    def setup(self):
+    def setup_wxdb(self):
         """Create table in database."""
         scripts = []
         script = '''CREATE TABLE window (

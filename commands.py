@@ -50,7 +50,6 @@ class Commands:
         self.config.set_pos(self.drawer.GetScreenPosition())
         self.config.set_size(self.drawer.GetSize())
         self.config.close()
-        self.notes.close()
         self.drawer.Destroy()
 
     def tree_select(self, event):

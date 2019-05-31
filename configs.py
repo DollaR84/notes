@@ -19,10 +19,10 @@ class Config(WXDB):
 
     def __init__(self):
         """Initialization config class."""
-        super().__init__(self.__class__.__name__.lower())
+        super().__init__('notes')
 
         if not self.db.if_exists('settings'):
-            self.setup()
+            self.setup_config()
 
         self.load()
 
@@ -49,7 +49,7 @@ class Config(WXDB):
         dlg.Destroy()
         self.load()
 
-    def setup(self):
+    def setup_config(self):
         """Create table settings in database."""
         scripts = []
         script = '''CREATE TABLE settings (
@@ -57,8 +57,5 @@ class Config(WXDB):
                     name TEXT NOT NULL,
                     value TEXT NOT NULL) WITHOUT ROWID
                  '''
-        scripts.append(script)
-        script = '''INSERT INTO settings (id, name, value)
-                    VALUES (1, "name", "notes")'''
         scripts.append(script)
         self.db.put(scripts)
