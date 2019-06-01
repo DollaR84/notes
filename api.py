@@ -24,8 +24,9 @@ class Notes:
         scripts = []
         script = '''CREATE TABLE notes (
                     id INTEGER PRIMARY KEY NOT NULL,
-                    name TEXT NOT NULL,
-                    value TEXT NOT NULL) WITHOUT ROWID
+                    title TEXT NOT NULL,
+                    data TEXT NOT NULL,
+                    parent INTEGER NOT NULL) WITHOUT ROWID
                  '''
         scripts.append(script)
         self.db.put(scripts)
