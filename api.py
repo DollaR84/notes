@@ -19,6 +19,18 @@ class Notes:
         if not self.db.if_exists('notes'):
             self.setup()
 
+    def get_titles(self):
+        """Return dict titles from database."""
+        script = 'SELECT id, title FROM notes'
+        rows = self.db.get(script)
+        return {row[0]: row[1] for row in rows}
+
+    def get_parents(self):
+        """Return dict parents from database."""
+        script = 'SELECT id, parent FROM notes'
+        rows = self.db.get(script)
+        return {row[0]: row[1] for row in rows}
+
     def setup(self):
         """Create table notes in database."""
         scripts = []
