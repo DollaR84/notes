@@ -26,8 +26,6 @@ class Commands:
         self.notes = Notes(self.config)
 
         self.set_window()
-        self.titles = self.notes.get_titles()
-        self.parents = self.notes.get_parents()
         self.init_tree()
 
     def set_window(self):
@@ -57,7 +55,10 @@ class Commands:
 
     def init_tree(self):
         """Initialization tree widget."""
-        self.root = self.drawer.tree.AddRoot('Заметки')
+        self.titles = self.notes.get_titles()
+        self.parents = self.notes.get_parents()
+        self.wx_tree_ids = {}
+        self.wx_tree_ids[0] = self.drawer.tree.AddRoot('Заметки')
 
     def tree_select(self, event):
         """Change select item in tree."""
