@@ -68,11 +68,23 @@ class Commands:
 
     def tree_select(self, event):
         """Change select item in tree."""
-        pass
+        self.drawer.but_save.Disable()
+        index = self.tree.wx_tree_id2id(self.drawer.tree.GetFocusedItem())
+        if index == 0:
+            self.drawer.but_del.Disable()
+            self.drawer.title.SetValue('')
+            self.drawer.data.SetValue('')
+        else:
+            self.drawer.but_del.Enable()
+            title, data = self.notes.get_note(index)
+            self.drawer.title.SetValue(title)
+            self.drawer.data.SetValue(data)
 
     def text_change(self, event):
         """Change text controls note."""
-        object = event.GetEventObject()
+        index = self.tree.wx_tree_id2id(self.drawer.tree.GetFocusedItem())
+        if index != 0:
+            self.drawer.but_save.Enable()
 
     def save(self, event):
         """Save note in database."""
