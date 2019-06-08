@@ -14,7 +14,7 @@ class WXDB:
     """Class default settings gui wx in database."""
 
     def __init__(self, db_name):
-        """Initialise base class settings wx in database."""
+        """Initialization base class settings wx in database."""
         self.db_name = db_name
         self.db = Database()
 
