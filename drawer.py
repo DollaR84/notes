@@ -45,6 +45,10 @@ class NotesFrame(wx.Frame):
         self.__create_widgets()
         self.__create_bindings()
 
+        self.command.init_tree()
+        self.but_save.Disable()
+        self.but_del.Disable()
+
     def __create_menu(self):
         """Create menu program."""
         menu_file = wx.Menu()
