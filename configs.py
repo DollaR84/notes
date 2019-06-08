@@ -58,4 +58,7 @@ class Config(WXDB):
                     value TEXT NOT NULL) WITHOUT ROWID
                  '''
         scripts.append(script)
+        script = '''INSERT INTO settings (id, name, value)
+                    VALUES (1, "root", "Заметки")'''
+        scripts.append(script)
         self.db.put(scripts)
