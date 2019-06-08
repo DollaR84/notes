@@ -31,6 +31,12 @@ class Notes:
         rows = self.db.get(script)
         return {row[0]: row[1] for row in rows}
 
+    def get_note(self, index):
+        """Return note title and data from database."""
+        script = 'SELECT title, data FROM notes WHERE id=%d' % index
+        row = self.db.get(script)
+        return (row[0], row[1])
+
     def setup(self):
         """Create table notes in database."""
         scripts = []
