@@ -14,6 +14,8 @@ from dialogs.dialogs import Message
 
 from configs import Config
 
+from tree import Tree
+
 
 class Commands:
     """Helper class, contains command for bind events, menu and buttons."""
@@ -24,9 +26,9 @@ class Commands:
         self.message = Message(self.drawer)
         self.config = Config()
         self.notes = Notes(self.config)
+        self.tree = Tree()
 
         self.set_window()
-        self.init_tree()
 
     def set_window(self):
         """Set size and position window from saving data."""
@@ -55,10 +57,14 @@ class Commands:
 
     def init_tree(self):
         """Initialization tree widget."""
-        self.titles = self.notes.get_titles()
-        self.parents = self.notes.get_parents()
-        self.wx_tree_ids = {}
-        self.wx_tree_ids[0] = self.drawer.tree.AddRoot('Заметки')
+        titles = self.notes.get_titles()
+        parents = self.notes.get_parents()
+        wx_tree_id = self.drawer.tree.AddRoot(self.config.root)
+        self.tree.add(0, -1, wx_tree_id)
+        for index, title in enumerate(titles, 1):
+            parent_wx_tree_id = self.tree.id2wx_tree_id(parents[index])
+            wx_tree_id = self.drawer.tree.AppendItem(parent_wx_tree_id, title)
+            self.tree.add(index, parents[index], wx_tree_id)
 
     def tree_select(self, event):
         """Change select item in tree."""
