@@ -35,7 +35,13 @@ class Notes:
         """Return note title and data from database."""
         script = 'SELECT title, data FROM notes WHERE id=%d' % index
         row = self.db.get(script)
-        return (row[0], row[1])
+        return (row[0][0], row[0][1])
+
+    def create(self, index, parent_id):
+        """Create new row in database."""
+        script = '''INSERT INTO notes (id, title, data, parent)
+                    VALUES (%d, "Новая заметка", "", %d)''' % (index, parent_id)
+        self.db.put(script)
 
     def setup(self):
         """Create table notes in database."""
