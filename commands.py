@@ -74,8 +74,12 @@ class Commands:
             self.drawer.but_del.Disable()
             self.drawer.title.SetValue('')
             self.drawer.data.SetValue('')
+            self.drawer.title.Disable()
+            self.drawer.data.Disable()
         else:
             self.drawer.but_del.Enable()
+            self.drawer.title.Enable()
+            self.drawer.data.Enable()
             title, data = self.notes.get_note(index)
             self.drawer.title.SetValue(title)
             self.drawer.data.SetValue(data)
