@@ -40,3 +40,11 @@ class Tree:
         for element in self.__elements:
             if element.wx_tree_id == wx_tree_id:
                 return element.id
+
+    def get_count(self):
+        """Return count elements in tree."""
+        return len(self.__elements)
+
+    def get_parent_id(self, index):
+        """Return parent id for incoming item."""
+        return self.__elements[index].parent_id
