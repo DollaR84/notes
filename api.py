@@ -20,10 +20,10 @@ class Notes:
             self.setup()
 
     def get_titles(self):
-        """Return list titles from database."""
-        script = 'SELECT title FROM notes'
+        """Return dict titles from database."""
+        script = 'SELECT id, title FROM notes'
         rows = self.db.get(script)
-        return [row[0] for row in rows]
+        return {row[0]: row[1] for row in rows}
 
     def get_parents(self):
         """Return dict parents from database."""

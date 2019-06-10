@@ -61,7 +61,8 @@ class Commands:
         parents = self.notes.get_parents()
         wx_tree_id = self.drawer.tree.AddRoot(self.config.root)
         self.tree.add(0, -1, wx_tree_id)
-        for index, title in enumerate(titles, 1):
+        for index in range(1, len(titles)):
+            title = titles[index]
             parent_wx_tree_id = self.tree.id2wx_tree_id(parents[index])
             wx_tree_id = self.drawer.tree.AppendItem(parent_wx_tree_id, title)
             self.tree.add(index, parents[index], wx_tree_id)
