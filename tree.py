@@ -31,12 +31,12 @@ class Tree:
 
     def id2wx_tree_id(self, index):
         """Return wx_tree_id from incoming id."""
-        for element in self.elements:
+        for element in self.__elements:
             if element.id == index:
                 return element.wx_tree_id
 
     def wx_tree_id2id(self, wx_tree_id):
         """Return id from incoming wx_tree_id."""
-        for element in self.elements:
+        for element in self.__elements:
             if element.wx_tree_id == wx_tree_id:
                 return element.id
