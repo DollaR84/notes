@@ -93,7 +93,12 @@ class Commands:
 
     def save(self, event):
         """Save note in database."""
-        pass
+        wx_tree_id = self.drawer.tree.GetFocusedItem()
+        index = self.tree.wx_tree_id2id(wx_tree_id)
+        title = self.drawer.title.GetValue()
+        data = self.drawer.data.GetValue()
+        self.notes.save(index, title, data)
+        self.drawer.tree.SetItemText(wx_tree_id, title)
 
     def delete(self, event):
         """Delete note from database."""

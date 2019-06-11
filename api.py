@@ -43,6 +43,11 @@ class Notes:
                     VALUES (%d, "Новая заметка", "", %d)''' % (index, parent_id)
         self.db.put(script)
 
+    def save(self, index, title, data):
+        """Save note in database."""
+        script = 'UPDATE notes SET title="%s", data="%s" WHERE id=%d' % (title, data, index)
+        self.db.put(script)
+
     def setup(self):
         """Create table notes in database."""
         scripts = []
