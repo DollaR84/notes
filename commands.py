@@ -72,24 +72,28 @@ class Commands:
         index = self.tree.wx_tree_id2id(self.drawer.tree.GetFocusedItem())
         if index == 0:
             self.drawer.but_del.Disable()
+            self.drawer.del_note.Enable(False)
             self.drawer.title.SetValue('')
             self.drawer.data.SetValue('')
             self.drawer.title.Disable()
             self.drawer.data.Disable()
         else:
             self.drawer.but_del.Enable()
+            self.drawer.del_note.Enable(True)
             self.drawer.title.Enable()
             self.drawer.data.Enable()
             title, data = self.notes.get_note(index)
             self.drawer.title.SetValue(title)
             self.drawer.data.SetValue(data)
         self.drawer.but_save.Disable()
+        self.drawer.save_note.Enable(False)
 
     def text_change(self, event):
         """Change text controls note."""
         index = self.tree.wx_tree_id2id(self.drawer.tree.GetFocusedItem())
         if index != 0:
             self.drawer.but_save.Enable()
+            self.drawer.save_note.Enable(True)
 
     def save(self, event):
         """Save note in database."""
@@ -99,6 +103,8 @@ class Commands:
         data = self.drawer.data.GetValue()
         self.notes.save(index, title, data)
         self.drawer.tree.SetItemText(wx_tree_id, title)
+        self.drawer.but_save.Disable()
+        self.drawer.save_note.Enable(False)
 
     def delete(self, event):
         """Delete note from database."""
@@ -119,6 +125,7 @@ class Commands:
         self.tree.add(index, parent_id, wx_tree_id)
         self.drawer.title.SetValue('Новая заметка')
         self.drawer.but_save.Disable()
+        self.drawer.save_note.Enable(False)
 
     def count(self, event):
         """Show information of count notes."""

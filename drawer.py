@@ -48,6 +48,8 @@ class NotesFrame(wx.Frame):
         self.command.init_tree()
         self.but_save.Disable()
         self.but_del.Disable()
+        self.save_note.Enable(False)
+        self.del_note.Enable(False)
 
     def __create_menu(self):
         """Create menu program."""
