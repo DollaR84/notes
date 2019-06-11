@@ -57,7 +57,7 @@ class NotesFrame(wx.Frame):
         menu_file = wx.Menu()
         self.create_root = menu_file.Append(-1, 'Создать ветку', 'Нажмите для создания записи в корне')
         self.create_child = menu_file.Append(-1, 'Создать запись', 'Нажмите для создания дочерней записи')
-        self.save_note = menu_file.Append(-1, 'Сохранить запись\tCtrl-S', 'Нажмите для сохранения записи')
+        self.save_note = menu_file.Append(-1, 'Сохранить запись', 'Нажмите для сохранения записи')
         self.del_note = menu_file.Append(-1, 'Удалить запись', 'Нажмите для удаления записи')
         menu_file.AppendSeparator()
         self.exit = menu_file.Append(-1, 'Выход', 'Нажмите для выхода из программы')
@@ -83,7 +83,11 @@ class NotesFrame(wx.Frame):
     def create_accel(self):
         """Create accelerated table for menu."""
         acceltbl = wx.AcceleratorTable([
-                                        (wx.ACCEL_CTRL, ord('Q'), self.exit.GetId())
+                                        (wx.ACCEL_CTRL, ord('N'), self.create_child.GetId()),
+                                        (wx.ACCEL_CTRL, ord('S'), self.save_note.GetId()),
+                                        (wx.ACCEL_CTRL, ord('Q'), self.exit.GetId()),
+                                        (wx.ACCEL_CTRL, ord('I'), self.count_total.GetId()),
+                                        (wx.ACCEL_CTRL, ord('O'), self.options.GetId())
                                        ])
         self.SetAcceleratorTable(acceltbl)
 
