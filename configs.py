@@ -61,4 +61,7 @@ class Config(WXDB):
         script = '''INSERT INTO settings (id, name, value)
                     VALUES (1, "root", "Заметки")'''
         scripts.append(script)
+        script = '''INSERT INTO settings (id, name, value)
+                    VALUES (2, "general_expand", "true")'''
+        scripts.append(script)
         self.db.put(scripts)

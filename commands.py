@@ -50,6 +50,8 @@ class Commands:
 
     def close_window(self, event):
         """Close window event."""
+        if self.config.general_expand == 'true':
+            self.expand_tree_save()
         self.config.set_pos(self.drawer.GetScreenPosition())
         self.config.set_size(self.drawer.GetSize())
         self.config.close()
@@ -66,6 +68,31 @@ class Commands:
             parent_wx_tree_id = self.tree.id2wx_tree_id(parents[index])
             wx_tree_id = self.drawer.tree.AppendItem(parent_wx_tree_id, title)
             self.tree.add(index, parents[index], wx_tree_id)
+        if self.config.general_expand == 'true':
+            self.expand_tree_init()
+
+    def expand_tree_init(self):
+        """Init expand tree if set config settings."""
+        expands = self.notes.get_expands()
+        wx_tree_id = self.tree.id2wx_tree_id(0)
+        self.drawer.tree.Expand(wx_tree_id)
+        for index in range(1, self.tree.get_count()):
+            wx_tree_id = self.tree.id2wx_tree_id(index)
+            if expands.get(index, 0) == 1:
+                self.drawer.tree.Expand(wx_tree_id)
+            else:
+                self.drawer.tree.Collapse(wx_tree_id)
+
+    def expand_tree_save(self):
+        """Save expand tree if set config settings."""
+        expands = {}
+        for index in range(1, self.tree.get_count()):
+            wx_tree_id = self.tree.id2wx_tree_id(index)
+            if self.drawer.tree.IsExpanded(wx_tree_id):
+                expands[index] = 1
+            else:
+                expands[index] = 0
+        self.notes.set_expands(expands)
 
     def tree_select(self, event):
         """Change select item in tree."""
