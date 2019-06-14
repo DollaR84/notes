@@ -48,6 +48,34 @@ class Notes:
         script = 'UPDATE notes SET title="%s", data="%s" WHERE id=%d' % (title, data, index)
         self.db.put(script)
 
+    def del_note(self, index):
+        """Delete note in database."""
+        script = 'SELECT id, parent FROM notes'
+        rows = self.db.get(script)
+        scripts = []
+        parent_id = 0
+        find = False
+        for row in rows:
+            if row[0] == index:
+                script = 'DELETE FROM notes WHERE id=%d' % row[0]
+                scripts.append(script)
+                parent_id = row[1]
+                find = True
+                continue
+            if find:
+                script = 'UPDATE notes SET id=%d WHERE id=%d' % (row[0]-1, row[0])
+                scripts.append(script)
+        self.db.put(scripts)
+        scripts.clear()
+        script = 'SELECT id FROM notes WHERE parent=%d' % index
+        rows = self.db.get(script)
+        for row in rows:
+            script = 'UPDATE notes SET parent=%d WHERE id=%d' % (parent_id, row[0])
+            scripts.append(script)
+        self.db.put(scripts)
+        script = 'DELETE FROM expands WHERE id=%d' % index
+        self.db.put(script)
+
     def get_expands(self):
         """Return dict all expand rows."""
         script = 'SELECT * FROM expands'

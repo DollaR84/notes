@@ -48,3 +48,7 @@ class Tree:
     def get_parent_id(self, index):
         """Return parent id for incoming item."""
         return self.__elements[index].parent_id
+
+    def clear(self):
+        """Clear all elements in tree."""
+        self.__elements.clear()

@@ -135,7 +135,13 @@ class Commands:
 
     def delete(self, event):
         """Delete note from database."""
-        pass
+        index = self.tree.wx_tree_id2id(self.drawer.tree.GetFocusedItem())
+        parent_id = self.tree.get_parent_id(index)
+        self.drawer.tree.DeleteAllItems()
+        self.notes.del_note(index)
+        self.tree.clear()
+        self.init_tree()
+        self.drawer.tree.SetFocusedItem(self.tree.id2wx_tree_id(parent_id))
 
     def create(self, event):
         """Create new note."""
@@ -156,7 +162,7 @@ class Commands:
 
     def count(self, event):
         """Show information of count notes."""
-        object = event.GetEventObject()
+        pass
 
     def options(self, event):
         """Run settings dialog."""
