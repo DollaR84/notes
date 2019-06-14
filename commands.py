@@ -162,7 +162,13 @@ class Commands:
 
     def count(self, event):
         """Show information of count notes."""
-        pass
+        if event.GetId() == self.drawer.count_root.GetId():
+            self.message.information('Информация', 'Количество веток %d' % self.tree.get_count_childs(0))
+        elif event.GetId() == self.drawer.count_child.GetId():
+            index = self.tree.wx_tree_id2id(self.drawer.tree.GetFocusedItem())
+            self.message.information('Информация', 'Количество дочерних записей %d' % self.tree.get_count_childs(index))
+        else:
+            self.message.information('Информация', 'Количество всего записей %d' % (self.tree.get_count()-1))
 
     def options(self, event):
         """Run settings dialog."""

@@ -45,6 +45,14 @@ class Tree:
         """Return count elements in tree."""
         return len(self.__elements)
 
+    def get_count_childs(self, parent_id):
+        """Return count child with incoming parent_id."""
+        result = 0
+        for element in self.__elements:
+            if element.parent_id == parent_id:
+                result += 1
+        return result
+
     def get_parent_id(self, index):
         """Return parent id for incoming item."""
         return self.__elements[index].parent_id
