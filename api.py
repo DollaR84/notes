@@ -63,7 +63,7 @@ class Notes:
                 find = True
                 continue
             if find:
-                script = 'UPDATE notes SET id=%d WHERE id=%d' % (row[0]-1, row[0])
+                script = 'UPDATE notes SET id=%d WHERE id=%d' % (row[0] - 1, row[0])
                 scripts.append(script)
         self.db.put(scripts)
         scripts.clear()

@@ -63,7 +63,7 @@ class Commands:
         parents = self.notes.get_parents()
         wx_tree_id = self.drawer.tree.AddRoot(self.config.root)
         self.tree.add(0, -1, wx_tree_id)
-        for index in range(1, len(titles)+1):
+        for index in range(1, len(titles) + 1):
             title = titles[index]
             parent_wx_tree_id = self.tree.id2wx_tree_id(parents[index])
             wx_tree_id = self.drawer.tree.AppendItem(parent_wx_tree_id, title)
@@ -168,7 +168,7 @@ class Commands:
             index = self.tree.wx_tree_id2id(self.drawer.tree.GetFocusedItem())
             self.message.information('Информация', 'Количество дочерних записей %d' % self.tree.get_count_childs(index))
         else:
-            self.message.information('Информация', 'Количество всего записей %d' % (self.tree.get_count()-1))
+            self.message.information('Информация', 'Количество всего записей %d' % (self.tree.get_count() - 1))
 
     def options(self, event):
         """Run settings dialog."""

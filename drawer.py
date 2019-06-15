@@ -83,11 +83,11 @@ class NotesFrame(wx.Frame):
     def create_accel(self):
         """Create accelerated table for menu."""
         acceltbl = wx.AcceleratorTable([
-                                        (wx.ACCEL_CTRL, ord('N'), self.create_child.GetId()),
-                                        (wx.ACCEL_CTRL, ord('S'), self.save_note.GetId()),
-                                        (wx.ACCEL_CTRL, ord('Q'), self.exit.GetId()),
-                                        (wx.ACCEL_CTRL, ord('I'), self.count_total.GetId()),
-                                        (wx.ACCEL_CTRL, ord('O'), self.options.GetId())
+                                       (wx.ACCEL_CTRL, ord('N'), self.create_child.GetId()),
+                                       (wx.ACCEL_CTRL, ord('S'), self.save_note.GetId()),
+                                       (wx.ACCEL_CTRL, ord('Q'), self.exit.GetId()),
+                                       (wx.ACCEL_CTRL, ord('I'), self.count_total.GetId()),
+                                       (wx.ACCEL_CTRL, ord('O'), self.options.GetId()),
                                        ])
         self.SetAcceleratorTable(acceltbl)
 
@@ -95,9 +95,9 @@ class NotesFrame(wx.Frame):
         """Create widgets program."""
         self.tree = wx.TreeCtrl(self.panel, wx.ID_ANY,
                                 style=wx.TR_DEFAULT_STYLE |
-                                      wx.TR_SINGLE |
-                                      wx.TR_LINES_AT_ROOT |
-                                      wx.TR_HAS_BUTTONS)
+                                wx.TR_SINGLE |
+                                wx.TR_LINES_AT_ROOT |
+                                wx.TR_HAS_BUTTONS)
         box_title = wx.StaticBox(self.panel, wx.ID_ANY, 'Заголовок')
         self.title = wx.TextCtrl(box_title, wx.ID_ANY)
         box_data = wx.StaticBox(self.panel, wx.ID_ANY, 'Текст')
