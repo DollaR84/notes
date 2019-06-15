@@ -15,10 +15,10 @@ from distutils.extension import Extension
 from Cython.Distutils import build_ext
 
 ext_modules = [
+               Extension("dialogs.dialogs", ["dialogs/dialogs.py"]),
+               Extension("dialogs.settings", ["dialogs/settings.py"]),
                Extension("api", ["api.py"]),
                Extension("commands", ["commands.py"]),
-               Extension("dialogs", ["dialogs/dialogs.py"]),
-               Extension("dialogs", ["dialogs/settings.py"]),
                Extension("drawer", ["drawer.py"]),
                Extension("configs", ["configs.py"]),
                Extension("database", ["database.py"]),
