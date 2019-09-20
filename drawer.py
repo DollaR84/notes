@@ -9,6 +9,8 @@ Created on 25.05.2019
 
 from commands import Commands
 
+from menu import Menu
+
 import wx
 
 
@@ -34,6 +36,7 @@ class NotesFrame(wx.Frame):
         """Initialization interface."""
         super().__init__(None, wx.ID_ANY, 'Заметки')
         self.command = Commands(self)
+        self.menu = Menu(self)
 
         self.panel = wx.Panel(self, wx.ID_ANY)
         sizer_panel = wx.BoxSizer(wx.HORIZONTAL)
@@ -41,56 +44,12 @@ class NotesFrame(wx.Frame):
         self.SetSizer(sizer_panel)
 
         self.CreateStatusBar()
-        self.__create_menu()
-        self.create_accel()
         self.__create_widgets()
         self.__create_bindings()
 
         self.command.init_tree()
         self.but_save.Disable()
         self.but_del.Disable()
-        self.save_note.Enable(False)
-        self.del_note.Enable(False)
-
-    def __create_menu(self):
-        """Create menu program."""
-        menu_file = wx.Menu()
-        self.create_root = menu_file.Append(-1, 'Создать ветку', 'Нажмите для создания записи в корне')
-        self.create_child = menu_file.Append(-1, 'Создать запись', 'Нажмите для создания дочерней записи')
-        self.save_note = menu_file.Append(-1, 'Сохранить запись', 'Нажмите для сохранения записи')
-        self.del_note = menu_file.Append(-1, 'Удалить запись', 'Нажмите для удаления записи')
-        menu_file.AppendSeparator()
-        self.exit = menu_file.Append(-1, 'Выход', 'Нажмите для выхода из программы')
-
-        menu_info = wx.Menu()
-        self.count_root = menu_info.Append(-1, 'Количество веток', 'Нажмите для информации о количестве веток')
-        self.count_child = menu_info.Append(-1, 'Количество записей', 'Нажмите для информации о количестве дочерних записей')
-        self.count_total = menu_info.Append(-1, 'Количество всего', 'Нажмите для информации об общем количестве записей')
-
-        menu_options = wx.Menu()
-        self.options = menu_options.Append(-1, 'Настройки...', 'Нажмите для изменения настроек программы')
-
-        menu_help = wx.Menu()
-        self.donate = menu_help.Append(-1, 'Донат...', 'Нажмите для поддержания дальнейшего развития проекта')
-        self.about = menu_help.Append(-1, 'О программе...', 'Нажмите для просмотра информации о программе')
-
-        menuBar = wx.MenuBar()
-        menuBar.Append(menu_file, 'Файл')
-        menuBar.Append(menu_info, 'Информация')
-        menuBar.Append(menu_options, 'Опции')
-        menuBar.Append(menu_help, 'Справка')
-        self.SetMenuBar(menuBar)
-
-    def create_accel(self):
-        """Create accelerated table for menu."""
-        acceltbl = wx.AcceleratorTable([
-                                       (wx.ACCEL_CTRL, ord('N'), self.create_child.GetId()),
-                                       (wx.ACCEL_CTRL, ord('S'), self.save_note.GetId()),
-                                       (wx.ACCEL_CTRL, ord('Q'), self.exit.GetId()),
-                                       (wx.ACCEL_CTRL, ord('I'), self.count_total.GetId()),
-                                       (wx.ACCEL_CTRL, ord('O'), self.options.GetId()),
-                                       ])
-        self.SetAcceleratorTable(acceltbl)
 
     def __create_widgets(self):
         """Create widgets program."""
@@ -127,7 +86,7 @@ class NotesFrame(wx.Frame):
         self.panel.SetSizer(sizer)
 
     def __create_bindings(self):
-        """Create bindings for menu, widgets and other events."""
+        """Create bindings for widgets and other events."""
         self.Bind(wx.EVT_CLOSE, getattr(self.command, 'close_window'))
         self.Bind(wx.EVT_TREE_SEL_CHANGED, getattr(self.command, 'tree_select'), self.tree)
         self.Bind(wx.EVT_TEXT, getattr(self.command, 'text_change'), self.title)
@@ -135,15 +94,3 @@ class NotesFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, getattr(self.command, 'save'), self.but_save)
         self.Bind(wx.EVT_BUTTON, getattr(self.command, 'delete'), self.but_del)
         self.Bind(wx.EVT_BUTTON, getattr(self.command, 'create'), self.but_create)
-
-        self.Bind(wx.EVT_MENU, getattr(self.command, 'create'), self.create_root)
-        self.Bind(wx.EVT_MENU, getattr(self.command, 'create'), self.create_child)
-        self.Bind(wx.EVT_MENU, getattr(self.command, 'save'), self.save_note)
-        self.Bind(wx.EVT_MENU, getattr(self.command, 'delete'), self.del_note)
-        self.Bind(wx.EVT_MENU, getattr(self.command, 'close'), self.exit)
-        self.Bind(wx.EVT_MENU, getattr(self.command, 'count'), self.count_root)
-        self.Bind(wx.EVT_MENU, getattr(self.command, 'count'), self.count_child)
-        self.Bind(wx.EVT_MENU, getattr(self.command, 'count'), self.count_total)
-        self.Bind(wx.EVT_MENU, getattr(self.command, 'options'), self.options)
-        self.Bind(wx.EVT_MENU, getattr(self.command, 'donate'), self.donate)
-        self.Bind(wx.EVT_MENU, getattr(self.command, 'about'), self.about)
