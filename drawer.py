@@ -71,6 +71,7 @@ class NotesFrame(wx.Frame):
         self.options = menu_options.Append(-1, 'Настройки...', 'Нажмите для изменения настроек программы')
 
         menu_help = wx.Menu()
+        self.donate = menu_help.Append(-1, 'Донат...', 'Нажмите для поддержания дальнейшего развития проекта')
         self.about = menu_help.Append(-1, 'О программе...', 'Нажмите для просмотра информации о программе')
 
         menuBar = wx.MenuBar()
@@ -144,4 +145,5 @@ class NotesFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, getattr(self.command, 'count'), self.count_child)
         self.Bind(wx.EVT_MENU, getattr(self.command, 'count'), self.count_total)
         self.Bind(wx.EVT_MENU, getattr(self.command, 'options'), self.options)
+        self.Bind(wx.EVT_MENU, getattr(self.command, 'donate'), self.donate)
         self.Bind(wx.EVT_MENU, getattr(self.command, 'about'), self.about)

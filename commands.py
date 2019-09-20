@@ -7,6 +7,8 @@ Created on 25.05.2019
 
 """
 
+import webbrowser
+
 from api import Notes
 
 from dialogs.dialogs import About
@@ -35,6 +37,10 @@ class Commands:
         self.drawer.SetPosition(self.config.get_pos())
         self.drawer.SetSize(self.config.get_size())
         self.drawer.Layout()
+
+    def donate(self, event):
+        """Run donate hyperlink in browser."""
+        webbrowser.open('https://privatbank.ua/sendmoney?payment=238a49dc4f28672ee467e18c5005cdc6287ac5d9')
 
     def about(self, event):
         """Run about dialog."""
