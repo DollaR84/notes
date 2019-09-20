@@ -9,7 +9,7 @@ Created on 25.05.2019
 
 from dialogs.dialogs import RetCode
 
-from dialogs.settings import SettingsDialog
+from dialogs.options import SettingsDialog
 
 from wxdb import WXDB
 
