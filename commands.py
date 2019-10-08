@@ -103,8 +103,10 @@ class Commands:
 
     def tree_select(self, event):
         """Change select item in tree."""
-        index = self.tree.wx_tree_id2id(self.drawer.tree.GetFocusedItem())
-        if index == 0:
+        index = self.tree.wx_tree_id2id(self.drawer.tree.GetSelection())
+        if index is None:
+            pass
+        elif index == 0:
             self.drawer.but_del.Disable()
             self.drawer.del_note.Enable(False)
             self.drawer.title.SetValue('')
@@ -124,14 +126,14 @@ class Commands:
 
     def text_change(self, event):
         """Change text controls note."""
-        index = self.tree.wx_tree_id2id(self.drawer.tree.GetFocusedItem())
+        index = self.tree.wx_tree_id2id(self.drawer.tree.GetSelection())
         if index != 0:
             self.drawer.but_save.Enable()
             self.drawer.save_note.Enable(True)
 
     def save(self, event):
         """Save note in database."""
-        wx_tree_id = self.drawer.tree.GetFocusedItem()
+        wx_tree_id = self.drawer.tree.GetSelection()
         index = self.tree.wx_tree_id2id(wx_tree_id)
         title = self.drawer.title.GetValue()
         data = self.drawer.data.GetValue()
@@ -142,37 +144,37 @@ class Commands:
 
     def delete(self, event):
         """Delete note from database."""
-        index = self.tree.wx_tree_id2id(self.drawer.tree.GetFocusedItem())
-        parent_id = self.tree.get_parent_id(index)
-        self.drawer.tree.DeleteAllItems()
-        self.notes.del_note(index)
-        self.tree.clear()
-        self.init_tree()
-        self.drawer.tree.SetFocusedItem(self.tree.id2wx_tree_id(parent_id))
+        if self.message.question(self.phrases.titles.warning, self.phrases.questions.del_note):
+            index = self.tree.wx_tree_id2id(self.drawer.tree.GetSelection())
+            parent_id = self.tree.get_parent_id(index)
+            self.drawer.tree.DeleteAllItems()
+            self.notes.del_note(index)
+            self.tree.clear()
+            self.init_tree()
+            self.drawer.tree.SelectItem(self.tree.id2wx_tree_id(parent_id))
 
     def create(self, event):
         """Create new note."""
         if event.GetId() == self.drawer.create_root.GetId():
             parent_id = 0
         else:
-            parent_id = self.tree.wx_tree_id2id(self.drawer.tree.GetFocusedItem())
+            parent_id = self.tree.wx_tree_id2id(self.drawer.tree.GetSelection())
         index = self.tree.get_count()
         self.notes.create(index, parent_id)
         parent_wx_tree_id = self.tree.id2wx_tree_id(parent_id)
         wx_tree_id = self.drawer.tree.AppendItem(parent_wx_tree_id, self.phrases.widgets.tree.new_note)
         self.drawer.tree.Expand(parent_wx_tree_id)
-        self.drawer.tree.SetFocusedItem(wx_tree_id)
+        self.drawer.tree.SelectItem(wx_tree_id)
         self.tree.add(index, parent_id, wx_tree_id)
         self.drawer.title.SetValue(self.phrases.widgets.new_title)
-        self.drawer.but_save.Disable()
-        self.drawer.save_note.Enable(False)
+        self.drawer.data.SetValue('')
 
     def count(self, event):
         """Show information of count notes."""
         if event.GetId() == self.drawer.count_root.GetId():
             self.message.information(self.phrases.titles.info, self.phrases.count.root % self.tree.get_count_childs(0))
         elif event.GetId() == self.drawer.count_child.GetId():
-            index = self.tree.wx_tree_id2id(self.drawer.tree.GetFocusedItem())
+            index = self.tree.wx_tree_id2id(self.drawer.tree.GetSelection())
             self.message.information(self.phrases.titles.info, self.phrases.count.child % self.tree.get_count_childs(index))
         else:
             self.message.information(self.phrases.titles.info, self.phrases.count.total % (self.tree.get_count() - 1))
