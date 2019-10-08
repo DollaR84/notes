@@ -24,6 +24,7 @@ ext_modules = [
                Extension("configs", ["configs.py"]),
                Extension("database", ["database.py"]),
                Extension("tree", ["tree.py"]),
+               Extension("version", ["version.py"]),
                Extension("wxdb", ["wxdb.py"])
               ]
 
