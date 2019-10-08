@@ -28,7 +28,7 @@ class Commands:
         self.phrases = self.drawer.phrases
         self.config = self.drawer.config
         self.message = Message(self.drawer)
-        self.notes = Notes(self.config)
+        self.notes = Notes()
         self.tree = Tree()
 
         self.set_window()
@@ -61,9 +61,12 @@ class Commands:
         """Close window event."""
         if self.config.general_expand == 'true':
             self.expand_tree_save()
+        self.notes.close()
+
         self.config.set_pos(self.drawer.GetScreenPosition())
         self.config.set_size(self.drawer.GetSize())
         self.config.close()
+
         self.drawer.Destroy()
 
     def init_tree(self):
@@ -168,6 +171,10 @@ class Commands:
         self.drawer.tree.Expand(parent_wx_tree_id)
         self.drawer.tree.SelectItem(wx_tree_id)
         self.tree.add(index, parent_id, wx_tree_id)
+        if not self.drawer.title.IsEnabled():
+            self.drawer.title.Enable()
+        if not self.drawer.data.IsEnabled():
+            self.drawer.data.Enable()
         self.drawer.title.SetValue(self.phrases.widgets.new_title)
         self.drawer.data.SetValue('')
 

@@ -19,7 +19,7 @@ class Config(WXDB):
 
     def __init__(self):
         """Initialization config class."""
-        super().__init__('notes')
+        super().__init__('settings')
 
         if not self.db.if_exists('settings'):
             self.setup_config()

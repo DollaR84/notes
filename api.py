@@ -7,17 +7,24 @@ Created on 31.05.2019
 
 """
 
+from database import Database
+
 
 class Notes:
     """Api class for work notes."""
 
-    def __init__(self, config):
+    def __init__(self):
         """Initialize notes class."""
-        self.config = config
-        self.db = self.config.db
+        self.db_name = 'notes'
+        self.db = Database()
+        self.db.connect(self.db_name + '.db')
 
         if not self.db.if_exists('notes'):
             self.setup()
+
+    def close(self):
+        """Save finish program."""
+        self.db.disconnect()
 
     def get_titles(self):
         """Return dict titles from database."""
