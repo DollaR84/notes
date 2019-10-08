@@ -23,6 +23,8 @@ class Config(WXDB):
 
         if not self.db.if_exists('settings'):
             self.setup_config()
+        if not self.db.if_exists('languages'):
+            self.setup_lang()
 
         self.load()
 
@@ -35,12 +37,18 @@ class Config(WXDB):
             setattr(self, line[1], line[2])
             self.ids[line[1]] = line[0]
 
+    def get_languages(self):
+        """Return dict all supported languages."""
+        script = 'SELECT name, code FROM languages'
+        data = self.db.get(script)
+        return {lang[1]: lang[0] for lang in data}
+
     def open_settings(self, parent):
         """Open settings dialog."""
         dlg = SettingsDialog(parent, self)
         if RetCode.OK == dlg.ShowModal():
-            dlg.get_all()
             scripts = []
+            dlg.config.pop('languages')
             for key, value in dlg.config.items():
                 script = '''UPDATE settings SET value="%s" WHERE id=%d
                      ''' % (value, self.ids[key])
@@ -59,9 +67,53 @@ class Config(WXDB):
                  '''
         scripts.append(script)
         script = '''INSERT INTO settings (id, name, value)
-                    VALUES (1, "root", "Заметки")'''
+                    VALUES (1, "donate_url", "https://privatbank.ua/sendmoney?payment=238a49dc4f28672ee467e18c5005cdc6287ac5d9")'''
         scripts.append(script)
         script = '''INSERT INTO settings (id, name, value)
-                    VALUES (2, "general_expand", "true")'''
+                    VALUES (2, "general_language", "ru")'''
+        scripts.append(script)
+        script = '''INSERT INTO settings (id, name, value)
+                    VALUES (3, "general_expand", "true")'''
         scripts.append(script)
         self.db.put(scripts)
+
+    def setup_lang(self):
+        """Create table languages in database."""
+        scripts = []
+        script = '''CREATE TABLE languages (
+                    id INTEGER PRIMARY KEY NOT NULL,
+                    name TEXT NOT NULL,
+                    code TEXT NOT NULL) WITHOUT ROWID
+                 '''
+        scripts.append(script)
+        script = '''INSERT INTO languages (id, name, code)
+                    VALUES (1, "русский", "ru")'''
+        scripts.append(script)
+        self.db.put(scripts)
+
+
+def load(data):
+    """Construct class from json data."""
+    temp_class_1 = type('__TempClass', (), {})
+    temp_object = temp_class_1()
+    for name, data_section in data.items():
+        temp_class_2 = type('__' + name, (), {})
+        setattr(temp_object, name, temp_class_2())
+        section = getattr(temp_object, name)
+        for key, value in data_section.items():
+            value = __sub_load(value)
+            setattr(section, key, value)
+
+    return temp_object
+
+
+def __sub_load(value):
+    """Sub function for load json data to class structures."""
+    __temp_class = type('__TempClass', (), {})
+    __temp_object = __temp_class()
+    if isinstance(value, dict):
+        for key, item in value.items():
+            item = __sub_load(item)
+            setattr(__temp_object, key, item)
+            value = __temp_object
+    return value

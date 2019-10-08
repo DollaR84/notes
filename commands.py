@@ -14,8 +14,6 @@ from api import Notes
 from dialogs.dialogs import About
 from dialogs.dialogs import Message
 
-from configs import Config
-
 from tree import Tree
 
 
@@ -25,8 +23,9 @@ class Commands:
     def __init__(self, drawer):
         """Initialization commands class."""
         self.drawer = drawer
+        self.phrases = self.drawer.phrases
+        self.config = self.drawer.config
         self.message = Message(self.drawer)
-        self.config = Config()
         self.notes = Notes(self.config)
         self.tree = Tree()
 
@@ -40,15 +39,17 @@ class Commands:
 
     def donate(self, event):
         """Run donate hyperlink in browser."""
-        webbrowser.open('https://privatbank.ua/sendmoney?payment=238a49dc4f28672ee467e18c5005cdc6287ac5d9')
+        webbrowser.open(self.config.donate_url)
 
     def about(self, event):
         """Run about dialog."""
-        About(self.drawer,
-              'О программе...',
-              'Заметки',
-              '1.0',
-              'Руслан Долованюк').ShowModal()
+        About(
+              self.drawer,
+              self.phrases.about.title,
+              self.phrases.about.name,
+              self.phrases.about.version,
+              self.phrases.about.author
+             ).ShowModal()
 
     def close(self, event):
         """Close event for button close."""
@@ -67,7 +68,7 @@ class Commands:
         """Initialization tree widget."""
         titles = self.notes.get_titles()
         parents = self.notes.get_parents()
-        wx_tree_id = self.drawer.tree.AddRoot(self.config.root)
+        wx_tree_id = self.drawer.tree.AddRoot(self.phrases.widgets.tree.root)
         self.tree.add(0, -1, wx_tree_id)
         for index in range(1, len(titles) + 1):
             title = titles[index]
@@ -158,23 +159,23 @@ class Commands:
         index = self.tree.get_count()
         self.notes.create(index, parent_id)
         parent_wx_tree_id = self.tree.id2wx_tree_id(parent_id)
-        wx_tree_id = self.drawer.tree.AppendItem(parent_wx_tree_id, 'Новая заметка')
+        wx_tree_id = self.drawer.tree.AppendItem(parent_wx_tree_id, self.phrases.widgets.tree.new_note)
         self.drawer.tree.Expand(parent_wx_tree_id)
         self.drawer.tree.SetFocusedItem(wx_tree_id)
         self.tree.add(index, parent_id, wx_tree_id)
-        self.drawer.title.SetValue('Новая заметка')
+        self.drawer.title.SetValue(self.phrases.widgets.new_title)
         self.drawer.but_save.Disable()
         self.drawer.save_note.Enable(False)
 
     def count(self, event):
         """Show information of count notes."""
         if event.GetId() == self.drawer.count_root.GetId():
-            self.message.information('Информация', 'Количество веток %d' % self.tree.get_count_childs(0))
+            self.message.information(self.phrases.titles.info, self.phrases.count.root % self.tree.get_count_childs(0))
         elif event.GetId() == self.drawer.count_child.GetId():
             index = self.tree.wx_tree_id2id(self.drawer.tree.GetFocusedItem())
-            self.message.information('Информация', 'Количество дочерних записей %d' % self.tree.get_count_childs(index))
+            self.message.information(self.phrases.titles.info, self.phrases.count.child % self.tree.get_count_childs(index))
         else:
-            self.message.information('Информация', 'Количество всего записей %d' % (self.tree.get_count() - 1))
+            self.message.information(self.phrases.titles.info, self.phrases.count.total % (self.tree.get_count() - 1))
 
     def options(self, event):
         """Run settings dialog."""

@@ -16,6 +16,7 @@ class Menu:
     def __init__(self, parent):
         """Initialization menu."""
         self.drawer = parent
+        self.phrases = self.drawer.phrases
         self.command = self.drawer.command
 
         self.__create_menu()
@@ -28,30 +29,30 @@ class Menu:
     def __create_menu(self):
         """Create menu program."""
         menu_file = wx.Menu()
-        self.drawer.create_root = menu_file.Append(-1, 'Создать ветку', 'Нажмите для создания записи в корне')
-        self.drawer.create_child = menu_file.Append(-1, 'Создать запись', 'Нажмите для создания дочерней записи')
-        self.drawer.save_note = menu_file.Append(-1, 'Сохранить запись', 'Нажмите для сохранения записи')
-        self.drawer.del_note = menu_file.Append(-1, 'Удалить запись', 'Нажмите для удаления записи')
+        self.drawer.create_root = menu_file.Append(-1, self.phrases.menu.file.items.create_root.name, self.phrases.menu.file.items.create_root.help)
+        self.drawer.create_child = menu_file.Append(-1, self.phrases.menu.file.items.create_child.name, self.phrases.menu.file.items.create_child.help)
+        self.drawer.save_note = menu_file.Append(-1, self.phrases.menu.file.items.save_note.name, self.phrases.menu.file.items.save_note.help)
+        self.drawer.del_note = menu_file.Append(-1, self.phrases.menu.file.items.del_note.name, self.phrases.menu.file.items.del_note.help)
         menu_file.AppendSeparator()
-        self.drawer.exit = menu_file.Append(-1, 'Выход', 'Нажмите для выхода из программы')
+        self.drawer.exit = menu_file.Append(-1, self.phrases.menu.file.items.exit.name, self.phrases.menu.file.items.exit.help)
 
         menu_info = wx.Menu()
-        self.drawer.count_root = menu_info.Append(-1, 'Количество веток', 'Нажмите для информации о количестве веток')
-        self.drawer.count_child = menu_info.Append(-1, 'Количество записей', 'Нажмите для информации о количестве дочерних записей')
-        self.drawer.count_total = menu_info.Append(-1, 'Количество всего', 'Нажмите для информации об общем количестве записей')
+        self.drawer.count_root = menu_info.Append(-1, self.phrases.menu.info.items.count_root.name, self.phrases.menu.info.items.count_root.help)
+        self.drawer.count_child = menu_info.Append(-1, self.phrases.menu.info.items.count_child.name, self.phrases.menu.info.items.count_child.help)
+        self.drawer.count_total = menu_info.Append(-1, self.phrases.menu.info.items.count_total.name, self.phrases.menu.info.items.count_total.help)
 
         menu_options = wx.Menu()
-        self.drawer.options = menu_options.Append(-1, 'Настройки...', 'Нажмите для изменения настроек программы')
+        self.drawer.options = menu_options.Append(-1, self.phrases.menu.options.items.settings.name, self.phrases.menu.options.items.settings.help)
 
         menu_help = wx.Menu()
-        self.drawer.donate = menu_help.Append(-1, 'Донат...', 'Нажмите для поддержания дальнейшего развития проекта')
-        self.drawer.about = menu_help.Append(-1, 'О программе...', 'Нажмите для просмотра информации о программе')
+        self.drawer.donate = menu_help.Append(-1, self.phrases.menu.help.items.donate.name, self.phrases.menu.help.items.donate.help)
+        self.drawer.about = menu_help.Append(-1, self.phrases.menu.help.items.about.name, self.phrases.menu.help.items.about.help)
 
         menuBar = wx.MenuBar()
-        menuBar.Append(menu_file, 'Файл')
-        menuBar.Append(menu_info, 'Информация')
-        menuBar.Append(menu_options, 'Опции')
-        menuBar.Append(menu_help, 'Справка')
+        menuBar.Append(menu_file, self.phrases.menu.file.title)
+        menuBar.Append(menu_info, self.phrases.menu.info.title)
+        menuBar.Append(menu_options, self.phrases.menu.options.title)
+        menuBar.Append(menu_help, self.phrases.menu.help.title)
         self.drawer.SetMenuBar(menuBar)
 
     def __create_accel(self):

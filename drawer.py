@@ -7,7 +7,11 @@ Created on 25.05.2019
 
 """
 
+import pickle
+
 from commands import Commands
+
+import configs
 
 from menu import Menu
 
@@ -34,7 +38,10 @@ class NotesFrame(wx.Frame):
 
     def __init__(self):
         """Initialization interface."""
-        super().__init__(None, wx.ID_ANY, 'Заметки')
+        self.config = configs.Config()
+        with open('languages.dat', 'rb') as lang_file:
+            self.phrases = configs.load(pickle.load(lang_file)[self.config.general_language])
+        super().__init__(None, wx.ID_ANY, self.phrases.titles.caption)
         self.command = Commands(self)
         self.menu = Menu(self)
 
@@ -58,13 +65,13 @@ class NotesFrame(wx.Frame):
                                 wx.TR_SINGLE |
                                 wx.TR_LINES_AT_ROOT |
                                 wx.TR_HAS_BUTTONS)
-        box_title = wx.StaticBox(self.panel, wx.ID_ANY, 'Заголовок')
+        box_title = wx.StaticBox(self.panel, wx.ID_ANY, self.phrases.widgets.box_title)
         self.title = wx.TextCtrl(box_title, wx.ID_ANY)
-        box_data = wx.StaticBox(self.panel, wx.ID_ANY, 'Текст')
+        box_data = wx.StaticBox(self.panel, wx.ID_ANY, self.phrases.widgets.box_data)
         self.data = wx.TextCtrl(box_data, wx.ID_ANY, style=wx.TE_MULTILINE)
-        self.but_save = wx.Button(self.panel, wx.ID_ANY, 'Сохранить')
-        self.but_del = wx.Button(self.panel, wx.ID_ANY, 'Удалить')
-        self.but_create = wx.Button(self.panel, wx.ID_ANY, 'Создать')
+        self.but_save = wx.Button(self.panel, wx.ID_ANY, self.phrases.widgets.but_save)
+        self.but_del = wx.Button(self.panel, wx.ID_ANY, self.phrases.widgets.but_del)
+        self.but_create = wx.Button(self.panel, wx.ID_ANY, self.phrases.widgets.but_create)
 
         sizer = wx.BoxSizer(wx.HORIZONTAL)
         left_sizer = wx.BoxSizer(wx.VERTICAL)
