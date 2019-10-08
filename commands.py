@@ -16,6 +16,8 @@ from dialogs.dialogs import Message
 
 from tree import Tree
 
+import version
+
 
 class Commands:
     """Helper class, contains command for bind events, menu and buttons."""
@@ -47,7 +49,7 @@ class Commands:
               self.drawer,
               self.phrases.about.title,
               self.phrases.about.name,
-              self.phrases.about.version,
+              version.VERSION,
               self.phrases.about.author
              ).ShowModal()
 
