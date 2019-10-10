@@ -66,15 +66,9 @@ class Config(WXDB):
                     value TEXT NOT NULL) WITHOUT ROWID
                  '''
         scripts.append(script)
-        script = '''INSERT INTO settings (id, name, value)
-                    VALUES (1, "donate_url", "https://privatbank.ua/sendmoney?payment=238a49dc4f28672ee467e18c5005cdc6287ac5d9")'''
-        scripts.append(script)
-        script = '''INSERT INTO settings (id, name, value)
-                    VALUES (2, "general_language", "ru")'''
-        scripts.append(script)
-        script = '''INSERT INTO settings (id, name, value)
-                    VALUES (3, "general_expand", "true")'''
-        scripts.append(script)
+        for substr in SCRIPTS['settings']:
+            script = 'INSERT INTO settings (id, name, value) VALUES ({})'.format(substr)
+            scripts.append(script)
         self.db.put(scripts)
 
     def setup_lang(self):
@@ -86,10 +80,22 @@ class Config(WXDB):
                     code TEXT NOT NULL) WITHOUT ROWID
                  '''
         scripts.append(script)
-        script = '''INSERT INTO languages (id, name, code)
-                    VALUES (1, "русский", "ru")'''
-        scripts.append(script)
+        for substr in SCRIPTS['languages']:
+            script = 'INSERT INTO languages (id, name, code) VALUES ({})'.format(substr)
+            scripts.append(script)
         self.db.put(scripts)
+
+
+SCRIPTS = {
+            "settings": [
+                         '1, "donate_url", "https://privatbank.ua/sendmoney?payment=238a49dc4f28672ee467e18c5005cdc6287ac5d9"',
+                         '2, "general_language", "ru"',
+                         '3, "general_expand", "true"'
+                        ],
+            "languages": [
+                           '1, "русский", "ru"'
+                          ]
+          }
 
 
 def load(data):
