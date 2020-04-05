@@ -7,9 +7,9 @@ Created on 25.05.2019
 
 """
 
-from dialogs.dialogs import RetCode
+from dialogs import RetCode
 
-from dialogs.options import SettingsDialog
+from options import SettingsDialog
 
 from wxdb import WXDB
 
@@ -23,8 +23,6 @@ class Config(WXDB):
 
         if not self.db.if_exists('settings'):
             self.setup_config()
-        if not self.db.if_exists('languages'):
-            self.setup_lang()
 
         self.load()
 
@@ -37,19 +35,24 @@ class Config(WXDB):
             setattr(self, line[1], line[2])
             self.ids[line[1]] = line[0]
 
+    def set_languages(self, languages):
+        """Set all supported languages from languages pack."""
+        self.__languages = languages
+
     def get_languages(self):
         """Return dict all supported languages."""
-        script = 'SELECT name, code FROM languages'
-        data = self.db.get(script)
-        return {lang[1]: lang[0] for lang in data}
+        return self.__languages
 
     def open_settings(self, parent):
         """Open settings dialog."""
         dlg = SettingsDialog(parent, self)
         if RetCode.OK == dlg.ShowModal():
             scripts = []
+            dlg.config.pop('donate_url')
             dlg.config.pop('languages')
             for key, value in dlg.config.items():
+                if key == '__languages':
+                    continue
                 script = '''UPDATE settings SET value="%s" WHERE id=%d
                      ''' % (value, self.ids[key])
                 scripts.append(script)
@@ -71,20 +74,6 @@ class Config(WXDB):
             scripts.append(script)
         self.db.put(scripts)
 
-    def setup_lang(self):
-        """Create table languages in database."""
-        scripts = []
-        script = '''CREATE TABLE languages (
-                    id INTEGER PRIMARY KEY NOT NULL,
-                    name TEXT NOT NULL,
-                    code TEXT NOT NULL) WITHOUT ROWID
-                 '''
-        scripts.append(script)
-        for substr in SCRIPTS['languages']:
-            script = 'INSERT INTO languages (id, name, code) VALUES ({})'.format(substr)
-            scripts.append(script)
-        self.db.put(scripts)
-
 
 SCRIPTS = {
             "settings": [
@@ -92,9 +81,6 @@ SCRIPTS = {
                          '2, "general_language", "ru"',
                          '3, "general_expand", "true"'
                         ],
-            "languages": [
-                           '1, "русский", "ru"'
-                          ]
           }
 
 
