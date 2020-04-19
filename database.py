@@ -56,13 +56,18 @@ class Database:
         """Return list tables names from database."""
         str_sql = 'SELECT name FROM sqlite_master WHERE type = "table"'
         self.cursor.execute(str_sql)
-        return self.cursor.fetchall()
+        return [table[0] for table in self.cursor.fetchall()]
 
-    def get_table_params(self, name):
+    def get_params(self, table):
         """Return list params table from database."""
-        str_sql = 'PRAGMA TABLE_INFO(%s)' % name
+        str_sql = 'PRAGMA TABLE_INFO(%s)' % table
         self.cursor.execute(str_sql)
         return self.cursor.fetchall()
+
+    def get_columns_names(self, table):
+        """Return list names columns table from database."""
+        params = self.get_params(table)
+        return [param[1] for param in params]
 
     def dump(self, file_sql):
         """Dump database in sql file."""
