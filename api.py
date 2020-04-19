@@ -9,6 +9,8 @@ Created on 31.05.2019
 
 from database import Database
 
+from tables import TABLES
+
 
 class Notes:
     """Api class for work notes."""
@@ -101,18 +103,10 @@ class Notes:
         self.db.put(scripts)
 
     def setup(self):
-        """Create table notes in database."""
+        """Create tables in database."""
         scripts = []
-        script = '''CREATE TABLE notes (
-                    id INTEGER PRIMARY KEY NOT NULL,
-                    title TEXT NOT NULL,
-                    data TEXT NOT NULL,
-                    parent INTEGER NOT NULL) WITHOUT ROWID
-                 '''
-        scripts.append(script)
-        script = '''CREATE TABLE expands (
-                    id INTEGER PRIMARY KEY NOT NULL,
-                    expand INTEGER NOT NULL) WITHOUT ROWID
-                 '''
-        scripts.append(script)
+        for table in ['notes', 'expands']:
+            script = 'CREATE TABLE {} ({}) WITHOUT ROWID'.format(table,
+                ', '.join([' '.join(row) for row in TABLES[table]]))
+            scripts.append(script)
         self.db.put(scripts)
