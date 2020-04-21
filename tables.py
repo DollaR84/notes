@@ -13,20 +13,20 @@ VERSION = 2
 
 TABLES = {
     "settings": [
-        ["'id'", "INTEGER", "PRIMARY KEY", "NOT NULL"],
-        ["'name'", "TEXT", "NOT NULL"],
-        ["'value'", "TEXT", "NOT NULL"]
+        ["id", "INTEGER", "PRIMARY KEY", "NOT NULL"],
+        ["name", "TEXT", "NOT NULL"],
+        ["value", "TEXT", "NOT NULL"]
     ],
     "notes": [
-        ["'id'", "INTEGER", "PRIMARY KEY", "NOT NULL"],
-        ["'title'", "TEXT", "NOT NULL"],
-        ["'data'", "TEXT", "NOT NULL"],
-        ["'parent'", "INTEGER", "NOT NULL"],
-        ["'order'", "INTEGER", "NOT NULL"]
+        ["id", "INTEGER", "PRIMARY KEY", "NOT NULL"],
+        ["title", "TEXT", "NOT NULL"],
+        ["data", "TEXT", "NOT NULL"],
+        ["parent", "INTEGER", "NOT NULL"],
+        ["order_sort", "INTEGER", "NOT NULL"]
     ],
     "expands": [
-        ["'id'", "INTEGER", "PRIMARY KEY", "NOT NULL"],
-        ["'expand'", "INTEGER", "NOT NULL"]
+        ["id", "INTEGER", "PRIMARY KEY", "NOT NULL"],
+        ["expand", "INTEGER", "NOT NULL"]
     ]
 }
 
