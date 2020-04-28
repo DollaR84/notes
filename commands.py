@@ -7,7 +7,13 @@ Created on 25.05.2019
 
 """
 
+from collections import OrderedDict
+
 import webbrowser
+
+from actions import Starter
+from actions import OrderUp, OrderDown
+from actions import SortName, SortChildCount
 
 from api import Notes
 
@@ -28,8 +34,9 @@ class Commands:
         self.phrases = self.drawer.phrases
         self.config = self.drawer.config
         self.message = Message(self.drawer)
-        self.notes = Notes()
+        self.notes = Notes(self.message, self.phrases)
         self.tree = Tree()
+        self.starter = Starter(self.tree, self.notes)
 
         self.set_window()
 
@@ -42,6 +49,10 @@ class Commands:
     def donate(self, event):
         """Run donate hyperlink in browser."""
         webbrowser.open(self.config.donate_url)
+
+    def home(self, event):
+        """Run home page hyperlink in browser."""
+        webbrowser.open(self.phrases.about.url)
 
     def about(self, event):
         """Run about dialog."""
@@ -69,14 +80,33 @@ class Commands:
 
         self.drawer.Destroy()
 
+    def __sort(self, titles, parents):
+        """Sort titles and parents dictionaries by order_sort field."""
+        order_titles = OrderedDict()
+        order_parents = OrderedDict()
+        parents_unique = {}
+        for key, value in parents.items():
+            if value not in parents_unique:
+                parents_unique[value] = []
+            parents_unique[value].append(key)
+        parents_unique_keys = sorted(list(parents_unique.keys()))
+        for parent in parents_unique_keys:
+            childs = parents_unique[parent]
+            order_dict = self.notes.get_order(parent)
+            order_id = [item[0] for item in sorted(list(order_dict.items()), key=lambda i: i[1])]
+            for index in order_id:
+                order_titles[index] = titles[index]
+                order_parents[index] = parents[index]
+        return order_titles, order_parents
+
     def init_tree(self):
         """Initialization tree widget."""
         titles = self.notes.get_titles()
         parents = self.notes.get_parents()
+        titles, parents = self.__sort(titles, parents)
         wx_tree_id = self.drawer.tree.AddRoot(self.phrases.widgets.tree.root)
         self.tree.add(0, -1, wx_tree_id)
-        for index in range(1, len(titles) + 1):
-            title = titles[index]
+        for index, title in titles.items():
             parent_wx_tree_id = self.tree.id2wx_tree_id(parents[index])
             wx_tree_id = self.drawer.tree.AppendItem(parent_wx_tree_id, title)
             self.tree.add(index, parents[index], wx_tree_id)
@@ -106,12 +136,25 @@ class Commands:
                 expands[index] = 0
         self.notes.set_expands(expands)
 
+    def __set_state_order_menuitem(self, state):
+        """Set state menu items order."""
+        self.drawer.order_up.Enable(state)
+        self.drawer.order_down.Enable(state)
+
+    def __set_state_sort_menuitem(self, state):
+        """Set state menu items sort."""
+        self.drawer.sort_name.Enable(state)
+        self.drawer.sort_childcount.Enable(state)
+
     def tree_select(self, event):
         """Change select item in tree."""
         index = self.tree.wx_tree_id2id(self.drawer.tree.GetSelection())
         if index is None:
-            pass
+            self.__set_state_order_menuitem(False)
+            self.__set_state_sort_menuitem(False)
         elif index == 0:
+            self.__set_state_order_menuitem(False)
+            self.__set_state_sort_menuitem(True)
             self.drawer.but_del.Disable()
             self.drawer.del_note.Enable(False)
             self.drawer.title.SetValue('')
@@ -119,6 +162,8 @@ class Commands:
             self.drawer.title.Disable()
             self.drawer.data.Disable()
         else:
+            self.__set_state_order_menuitem(True)
+            self.__set_state_sort_menuitem(True)
             self.drawer.but_del.Enable()
             self.drawer.del_note.Enable(True)
             self.drawer.title.Enable()
@@ -165,7 +210,8 @@ class Commands:
         else:
             parent_id = self.tree.wx_tree_id2id(self.drawer.tree.GetSelection())
         index = self.tree.get_count()
-        self.notes.create(index, parent_id)
+        order_sort = self.tree.get_count_childs()
+        self.notes.create(index, parent_id, order_sort)
         parent_wx_tree_id = self.tree.id2wx_tree_id(parent_id)
         wx_tree_id = self.drawer.tree.AppendItem(parent_wx_tree_id, self.phrases.widgets.tree.new_note)
         self.drawer.tree.Expand(parent_wx_tree_id)
@@ -177,6 +223,22 @@ class Commands:
             self.drawer.data.Enable()
         self.drawer.title.SetValue(self.phrases.widgets.new_title)
         self.drawer.data.SetValue('')
+
+    def order(self, event):
+        """Order items."""
+        index = self.tree.wx_tree_id2id(self.drawer.tree.GetSelection())
+        if event.GetId() == self.drawer.order_up.GetId():
+            self.starter.run(OrderUp(index))
+        elif event.GetId() == self.drawer.order_down.GetId():
+            self.starter.run(OrderDown(index))
+
+    def sort(self, event):
+        """Sort items."""
+        index = self.tree.wx_tree_id2id(self.drawer.tree.GetSelection())
+        if event.GetId() == self.drawer.sort_name.GetId():
+            self.starter.run(SortName(index))
+        elif event.GetId() == self.drawer.sort_childcount.GetId():
+            self.starter.run(SortChildCount(index))
 
     def count(self, event):
         """Show information of count notes."""

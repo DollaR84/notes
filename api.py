@@ -117,6 +117,19 @@ class Notes:
         script = 'DELETE FROM expands WHERE id=%d' % index
         self.db.put(script)
 
+    def update(self, items):
+        """Update order_sort param notes in database.
+
+        Input parameters:
+        items: dict {id: order_sort};
+
+        """
+        scripts = []
+        for index, value in items.items():
+            script = 'UPDATE notes SET order_sort=%d WHERE id=%d' % (value, index)
+            scripts.append(script)
+        self.db.put(scripts)
+
     def get_expands(self):
         """Return dict all expand rows."""
         script = 'SELECT * FROM expands'
