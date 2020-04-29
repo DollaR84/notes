@@ -46,7 +46,7 @@ class Menu:
         self.drawer.order_down = menu_order.Append(-1, self.phrases.menu.edit.items.order.items.down.name, self.phrases.menu.edit.items.order.items.down.help)
         menu_edit.Append(-1, self.phrases.menu.edit.items.order.title, menu_order)
         menu_sort = wx.Menu()
-        self.drawer.sort_name = menu_sort.Append(-1, self.phrases.menu.edit.items.sort.items.name.name, self.phrases.menu.edit.items.sort.items.name.help)
+        self.drawer.sort_name = menu_sort.Append(-1, self.phrases.menu.edit.items.sort.items.titles.name, self.phrases.menu.edit.items.sort.items.titles.help)
         self.drawer.sort_childcount = menu_sort.Append(-1, self.phrases.menu.edit.items.sort.items.child.name, self.phrases.menu.edit.items.sort.items.child.help)
         menu_edit.Append(-1, self.phrases.menu.edit.items.sort.title, menu_sort)
 
