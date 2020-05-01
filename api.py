@@ -121,12 +121,12 @@ class Notes:
         """Update order_sort param notes in database.
 
         Input parameters:
-        items: dict {id: order_sort};
+        items: dict {id: (parent, order_sort)};
 
         """
         scripts = []
         for index, value in items.items():
-            script = 'UPDATE notes SET order_sort=%d WHERE id=%d' % (value, index)
+            script = 'UPDATE notes SET parent=%d, order_sort=%d WHERE id=%d' % (value[0], value[1], index)
             scripts.append(script)
         self.db.put(scripts)
 

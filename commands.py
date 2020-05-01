@@ -13,7 +13,7 @@ import webbrowser
 
 from actions import Starter
 from actions import OrderUp, OrderDown
-from actions import SortName, SortChildCount
+from actions import SortTitle, SortChildCountUp, SortChildCountDown
 
 from api import Notes
 
@@ -143,8 +143,9 @@ class Commands:
 
     def __set_state_sort_menuitem(self, state):
         """Set state menu items sort."""
-        self.drawer.sort_name.Enable(state)
-        self.drawer.sort_childcount.Enable(state)
+        self.drawer.sort_titles.Enable(state)
+        self.drawer.sort_childcount_up.Enable(state)
+        self.drawer.sort_childcount_down.Enable(state)
 
     def tree_select(self, event):
         """Change select item in tree."""
@@ -231,14 +232,26 @@ class Commands:
             self.starter.run(OrderUp(index))
         elif event.GetId() == self.drawer.order_down.GetId():
             self.starter.run(OrderDown(index))
+        self.expand_tree_save()
+        self.tree.clear()
+        self.drawer.tree.DeleteAllItems()
+        self.init_tree()
+        self.drawer.tree.SelectItem(self.tree.id2wx_tree_id(index))
 
     def sort(self, event):
         """Sort items."""
         index = self.tree.wx_tree_id2id(self.drawer.tree.GetSelection())
-        if event.GetId() == self.drawer.sort_name.GetId():
-            self.starter.run(SortName(index))
-        elif event.GetId() == self.drawer.sort_childcount.GetId():
-            self.starter.run(SortChildCount(index))
+        if event.GetId() == self.drawer.sort_titles.GetId():
+            self.starter.run(SortTitle(index))
+        elif event.GetId() == self.drawer.sort_childcount_up.GetId():
+            self.starter.run(SortChildCountUp(index))
+        elif event.GetId() == self.drawer.sort_childcount_down.GetId():
+            self.starter.run(SortChildCountDown(index))
+        self.expand_tree_save()
+        self.tree.clear()
+        self.drawer.tree.DeleteAllItems()
+        self.init_tree()
+        self.drawer.tree.SelectItem(self.tree.id2wx_tree_id(index))
 
     def count(self, event):
         """Show information of count notes."""
