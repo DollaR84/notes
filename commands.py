@@ -211,7 +211,7 @@ class Commands:
         else:
             parent_id = self.tree.wx_tree_id2id(self.drawer.tree.GetSelection())
         index = self.tree.get_count()
-        order_sort = self.tree.get_count_childs()
+        order_sort = self.tree.get_count_childs(parent_id) + 1
         self.notes.create(index, parent_id, order_sort)
         parent_wx_tree_id = self.tree.id2wx_tree_id(parent_id)
         wx_tree_id = self.drawer.tree.AppendItem(parent_wx_tree_id, self.phrases.widgets.tree.new_note)
