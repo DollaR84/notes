@@ -55,7 +55,12 @@ class Tree:
 
     def get_parent_id(self, index):
         """Return parent id for incoming item."""
-        return self.__elements[index].parent_id
+        result = 0
+        for element in self.__elements:
+            if element.id == index:
+                result = element.parent_id
+                break
+        return result
 
     def clear(self):
         """Clear all elements in tree."""
