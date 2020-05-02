@@ -88,6 +88,9 @@ class OrderDown(BaseAction):
             for key, value in order_dict.items():
                 if value == order_dict[self.index] + 1:
                     if tree.get_count_childs(key) != 0:
+                        for key_old, value_old in order_dict.items():
+                            if value_old > order_dict[self.index]:
+                                items[key_old] = (parent, value_old - 1)
                         items[self.index] = (key, 1)
                         order_dict_new = notes.get_order(key)
                         for key_new, value_new in order_dict_new.items():
