@@ -81,38 +81,32 @@ class Notes:
         """Delete note in database."""
         script = 'SELECT id, parent, order_sort FROM notes'
         rows = self.db.get(script)
+        script = 'SELECT parent, order_sort FROM notes WHERE id=%d' % index
+        parent_id, order_sort = self.db.get(script)[0]
+        script = 'SELECT id FROM notes WHERE parent=%d' % parent_id
+        parent_order_last = len(self.db.get(script))
         scripts = []
-        parent_id = 0
-        parent_order_last = 0
-        childs = []
-        find = False
+        script = 'DELETE FROM notes WHERE id=%d' % index
+        scripts.append(script)
+        childs = [row[0] for row in rows if row[1] == index]
+        for i, value in enumerate(childs):
+            if value > index:
+                childs[i] = value - 1
         for row in rows:
-            if row[1] == index:
-                if row[0] < index:
-                    childs.append(row[0])
-                else:
-                    childs.append(row[0]-1)
-            if row[0] == index:
-                script = 'DELETE FROM notes WHERE id=%d' % row[0]
-                scripts.append(script)
-                parent_id = row[1]
-                script = 'SELECT id FROM notes WHERE parent=%d' % parent_id
-                parent_order_last = len(self.db.get(script))
-                find = True
-                continue
-            if find:
-                parent = row[1] if (row[1] < index) else row[1]-1
-                if row[1] == parent_id:
-                    script = 'UPDATE notes SET id=%d, parent=%d, order_sort=%d WHERE id=%d' % (row[0]-1, parent, row[2]-1, row[0])
-                else:
-                    script = 'UPDATE notes SET id=%d, parent=%d WHERE id=%d' % (row[0]-1, parent, row[0])
-                scripts.append(script)
+            index_id = row[0] if (row[0] < index) else row[0]-1
+            parent = row[1] if (row[1] < index) else row[1]-1
+            if row[1] == parent_id:
+                order = row[2] if (row[2] < order_sort) else row[2]-1
+                script = 'UPDATE notes SET id=%d, parent=%d, order_sort=%d WHERE id=%d' % (index_id, parent, order, row[0])
+            else:
+                script = 'UPDATE notes SET id=%d, parent=%d WHERE id=%d' % (index_id, parent, row[0])
+            scripts.append(script)
         self.db.put(scripts)
         scripts.clear()
         for child in childs:
-            parent_order_last += 1
             script = 'UPDATE notes SET parent=%d, order_sort=%d WHERE id=%d' % (parent_id, parent_order_last, child)
             scripts.append(script)
+            parent_order_last += 1
         self.db.put(scripts)
         script = 'DELETE FROM expands WHERE id=%d' % index
         self.db.put(script)
