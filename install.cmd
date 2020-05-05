@@ -3,6 +3,7 @@ pyinstaller -F --noconsole ^
 --add-binary dialogs/options.pyd;dialogs ^
 --add-binary actions.pyd;. ^
 --add-binary api.pyd;. ^
+--add-binary copy.pyd;. ^
 --add-binary commands.pyd;. ^
 --add-binary configs.pyd;. ^
 --add-binary converter.pyd;. ^

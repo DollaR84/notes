@@ -19,6 +19,7 @@ ext_modules = [
                Extension("dialogs.options", ["dialogs/options.py"]),
                Extension("actions", ["actions.py"]),
                Extension("api", ["api.py"]),
+               Extension("copy", ["copy.py"]),
                Extension("commands", ["commands.py"]),
                Extension("drawer", ["drawer.py"]),
                Extension("menu", ["menu.py"]),
