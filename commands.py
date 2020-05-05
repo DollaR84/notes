@@ -8,7 +8,7 @@ Created on 25.05.2019
 """
 
 from collections import OrderedDict
-
+import copy
 import webbrowser
 
 from actions import Starter
@@ -82,34 +82,32 @@ class Commands:
 
     def __sort(self, titles, parents):
         """Sort titles and parents dictionaries by order_sort field."""
-        order_titles = OrderedDict()
-        order_parents = OrderedDict()
-        parents_unique = {}
-        for key, value in parents.items():
-            if value not in parents_unique:
-                parents_unique[value] = []
-            parents_unique[value].append(key)
-        parents_unique_keys = sorted(list(parents_unique.keys()))
-        for parent in parents_unique_keys:
-            childs = parents_unique[parent]
-            order_dict = self.notes.get_order(parent)
-            order_id = [item[0] for item in sorted(list(order_dict.items()), key=lambda i: i[1])]
-            for index in order_id:
-                order_titles[index] = titles[index]
-                order_parents[index] = parents[index]
-        return order_titles, order_parents
+        sort_notes = OrderedDict()
+        parents_list = [0]
+        childs = []
+        while parents:
+            for parent in parents_list:
+                order_dict = self.notes.get_order(parent)
+                if order_dict:
+                    order_id = [item[0] for item in sorted(list(order_dict.items()), key=lambda i: i[1])]
+                    for index in order_id:
+                        sort_notes[index] = (parent, titles[index])
+                        parents.pop(index)
+                    childs.append(copy.copy(order_id))
+            parents_list = childs.pop(0)
+        return sort_notes
 
     def init_tree(self):
         """Initialization tree widget."""
         titles = self.notes.get_titles()
         parents = self.notes.get_parents()
-        titles, parents = self.__sort(titles, parents)
+        sort_notes = self.__sort(titles, parents)
         wx_tree_id = self.drawer.tree.AddRoot(self.phrases.widgets.tree.root)
         self.tree.add(0, -1, wx_tree_id)
-        for index, title in titles.items():
-            parent_wx_tree_id = self.tree.id2wx_tree_id(parents[index])
-            wx_tree_id = self.drawer.tree.AppendItem(parent_wx_tree_id, title)
-            self.tree.add(index, parents[index], wx_tree_id)
+        for index, note in sort_notes.items():
+            parent_wx_tree_id = self.tree.id2wx_tree_id(note[0])
+            wx_tree_id = self.drawer.tree.AppendItem(parent_wx_tree_id, note[1])
+            self.tree.add(index, note[0], wx_tree_id)
         if self.config.general_expand == 'true':
             self.expand_tree_init()
 
