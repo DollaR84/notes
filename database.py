@@ -77,6 +77,6 @@ class Database:
 
     def restore(self, file_sql):
         """Restore database from sql file."""
-        with open(file_sql, 'r') as sql:
+        with open(file_sql, 'r', encoding='utf-8') as sql:
             for line in sql:
                 self.cursor.execute(line)
