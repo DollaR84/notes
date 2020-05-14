@@ -121,7 +121,7 @@ class SortTitle(BaseAction):
         for key in list(order_dict.keys()):
             titles[key] = notes.get_note(key)[0]
         order_id = [item[0] for item in sorted(list(titles.items()), key=lambda i: i[1])]
-        for i, index in enumerate(order_id):
+        for i, index in enumerate(order_id, 1):
             items[index] = (self.index, i)
         notes.update(items)
 
@@ -137,7 +137,7 @@ class SortChildCountUp(BaseAction):
         for key in list(order_dict.keys()):
             childs[key] = tree.get_count_childs(key)
         order_id = [item[0] for item in sorted(list(childs.items()), key=lambda i: i[1])]
-        for i, index in enumerate(order_id):
+        for i, index in enumerate(order_id, 1):
             items[index] = (self.index, i)
         notes.update(items)
 
@@ -153,6 +153,6 @@ class SortChildCountDown(BaseAction):
         for key in list(order_dict.keys()):
             childs[key] = tree.get_count_childs(key)
         order_id = list(reversed([item[0] for item in sorted(list(childs.items()), key=lambda i: i[1])]))
-        for i, index in enumerate(order_id):
+        for i, index in enumerate(order_id, 1):
             items[index] = (self.index, i)
         notes.update(items)
