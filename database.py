@@ -30,18 +30,17 @@ class Database:
         if self.conn is not None:
             self.conn.close()
 
-    def get(self, script):
+    def get(self, script, *args):
         """Get data from database."""
-        self.cursor.execute(script)
+        self.cursor.execute(script, args)
         return self.cursor.fetchall()
 
-    def put(self, script):
+    def put(self, script, *args):
         """Set data in database."""
-        if isinstance(script, str):
-            self.cursor.execute(script)
-        else:
-            for line in script:
-                self.cursor.execute(line)
+        self.cursor.execute(script, args)
+
+    def commit(self):
+        """Commit all putting rows in database."""
         self.conn.commit()
 
     def if_exists(self, table):

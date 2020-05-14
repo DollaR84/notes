@@ -68,11 +68,10 @@ class DBConverter:
         os.rename(self.__db_name + '.db', self.__db_name + '_old_v1.db')
         self.__db.connect(self.__db_name + '.db')
         counter = {}
-        scripts = []
         for table, rows in self.__old_data.items():
             script = 'CREATE TABLE {} ({}) WITHOUT ROWID'.format(table,
                 ', '.join([' '.join(row) for row in tables.TABLES[table]]))
-            scripts.append(script)
+            self.__db.put(script)
             for row in rows:
                 row = self.__fix_data(row)
                 columns = tables.get_columns_names(table)
@@ -89,8 +88,8 @@ class DBConverter:
                     script = 'INSERT INTO {} ({}) VALUES ({})'.format(table,
                         ', '.join(columns),
                         ', '.join(row))
-                scripts.append(script)
-        self.__db.put(scripts)
+                self.__db.put(script)
+        self.__db.commit()
         self.__db.disconnect()
 
     def run(self):

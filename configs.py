@@ -49,30 +49,27 @@ class Config(WXDB):
         """Open settings dialog."""
         dlg = SettingsDialog(parent, self)
         if RetCode.OK == dlg.ShowModal():
-            scripts = []
             dlg.config.pop('donate_url')
             dlg.config.pop('languages')
             for key, value in dlg.config.items():
                 if key == '__languages':
                     continue
-                script = '''UPDATE settings SET value="%s" WHERE id=%d
-                     ''' % (value, self.ids[key])
-                scripts.append(script)
-            self.db.put(scripts)
+                script = '''UPDATE settings SET value=? WHERE id=?'''
+                self.db.put(script, value, self.ids[key])
+            self.db.commit()
         dlg.Destroy()
         self.load()
 
     def setup_config(self):
         """Create table settings in database."""
-        scripts = []
-        table = 'settings'
+        table, params = tuple(DEFAULT_DATA.items())[0]
         script = 'CREATE TABLE {} ({}) WITHOUT ROWID'.format(table,
             ', '.join([' '.join(row) for row in TABLES[table]]))
-        scripts.append(script)
-        for substr in DEFAULT_DATA['settings']:
-            script = 'INSERT INTO settings (id, name, value) VALUES ({})'.format(substr)
-            scripts.append(script)
-        self.db.put(scripts)
+        self.db.put(script)
+        for substr in params:
+            script = 'INSERT INTO {} (id, name, value) VALUES ({})'.format(table, substr)
+            self.db.put(script)
+        self.db.commit()
 
 
 DEFAULT_DATA = {
