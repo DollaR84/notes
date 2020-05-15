@@ -7,4 +7,4 @@ Created on 08.10.2019
 
 """
 
-VERSION = '1.4'
+VERSION = '1.5'
