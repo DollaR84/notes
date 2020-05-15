@@ -56,6 +56,7 @@ class Config(WXDB):
 
     def open_settings(self, parent):
         """Open settings dialog."""
+        result = False
         dlg = SettingsDialog(parent, self)
         if RetCode.OK == dlg.ShowModal():
             dlg.config.pop('donate_url')
@@ -66,8 +67,10 @@ class Config(WXDB):
                 script = '''UPDATE settings SET value=? WHERE id=?'''
                 self.db.put(script, value, self.ids[key])
             self.db.commit()
+            result = True
         dlg.Destroy()
         self.load()
+        return result
 
     def setup_config(self):
         """Create table settings in database."""

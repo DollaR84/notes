@@ -267,5 +267,5 @@ class Commands:
 
     def options(self, event):
         """Run settings dialog."""
-        self.config.open_settings(self.drawer)
-        self.message.information(self.phrases.titles.info, self.phrases.info.need_restart)
+        if self.config.open_settings(self.drawer):
+            self.message.information(self.phrases.titles.info, self.phrases.info.need_restart)
