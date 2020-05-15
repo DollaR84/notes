@@ -156,22 +156,31 @@ class Commands:
             self.__set_state_sort_menuitem(True)
             self.drawer.but_del.Disable()
             self.drawer.del_note.Enable(False)
-            self.drawer.title.SetValue('')
             self.drawer.data.SetValue('')
-            self.drawer.title.Disable()
             self.drawer.data.Disable()
         else:
             self.__set_state_order_menuitem(True)
             self.__set_state_sort_menuitem(True)
             self.drawer.but_del.Enable()
             self.drawer.del_note.Enable(True)
-            self.drawer.title.Enable()
             self.drawer.data.Enable()
-            title, data = self.notes.get_note(index)
-            self.drawer.title.SetValue(title)
+            data = self.notes.get_note(index)
             self.drawer.data.SetValue(data)
         self.drawer.but_save.Disable()
         self.drawer.save_note.Enable(False)
+
+    def tree_activated(self, event):
+        """Activated edit label on tree item."""
+        index = self.tree.wx_tree_id2id(self.drawer.tree.GetSelection())
+        if index != 0:
+            self.drawer.tree.EditLabel(event.GetItem())
+
+    def tree_end_edit(self, event):
+        """Finish edit label item tree."""
+        wx_tree_id = self.drawer.tree.GetSelection()
+        index = self.tree.wx_tree_id2id(wx_tree_id)
+        title = event.GetLabel()
+        self.notes.save_title(index, title)
 
     def text_change(self, event):
         """Change text controls note."""
@@ -181,13 +190,11 @@ class Commands:
             self.drawer.save_note.Enable(True)
 
     def save(self, event):
-        """Save note in database."""
+        """Save data note in database."""
         wx_tree_id = self.drawer.tree.GetSelection()
         index = self.tree.wx_tree_id2id(wx_tree_id)
-        title = self.drawer.title.GetValue()
         data = self.drawer.data.GetValue()
-        self.notes.save(index, title, data)
-        self.drawer.tree.SetItemText(wx_tree_id, title)
+        self.notes.save_data(index, data)
         self.drawer.but_save.Disable()
         self.drawer.save_note.Enable(False)
 
@@ -210,18 +217,15 @@ class Commands:
             parent_id = self.tree.wx_tree_id2id(self.drawer.tree.GetSelection())
         index = self.tree.get_count()
         order_sort = self.tree.get_count_childs(parent_id) + 1
-        self.notes.create(index, parent_id, order_sort)
         parent_wx_tree_id = self.tree.id2wx_tree_id(parent_id)
         wx_tree_id = self.drawer.tree.AppendItem(parent_wx_tree_id, self.phrases.widgets.tree.new_note)
         self.drawer.tree.Expand(parent_wx_tree_id)
         self.drawer.tree.SelectItem(wx_tree_id)
         self.tree.add(index, parent_id, wx_tree_id)
-        if not self.drawer.title.IsEnabled():
-            self.drawer.title.Enable()
         if not self.drawer.data.IsEnabled():
             self.drawer.data.Enable()
-        self.drawer.title.SetValue(self.phrases.widgets.new_title)
         self.drawer.data.SetValue('')
+        self.notes.create(index, self.drawer.tree.GetItemText(wx_tree_id), parent_id, order_sort)
 
     def order(self, event):
         """Order items."""
@@ -254,13 +258,14 @@ class Commands:
     def count(self, event):
         """Show information of count notes."""
         if event.GetId() == self.drawer.count_root.GetId():
-            self.message.information(self.phrases.titles.info, self.phrases.count.root % self.tree.get_count_childs(0))
+            self.message.information(self.phrases.titles.info, self.phrases.info.count.root % self.tree.get_count_childs(0))
         elif event.GetId() == self.drawer.count_child.GetId():
             index = self.tree.wx_tree_id2id(self.drawer.tree.GetSelection())
-            self.message.information(self.phrases.titles.info, self.phrases.count.child % self.tree.get_count_childs(index))
+            self.message.information(self.phrases.titles.info, self.phrases.info.count.child % self.tree.get_count_childs(index))
         else:
-            self.message.information(self.phrases.titles.info, self.phrases.count.total % (self.tree.get_count() - 1))
+            self.message.information(self.phrases.titles.info, self.phrases.info.count.total % (self.tree.get_count() - 1))
 
     def options(self, event):
         """Run settings dialog."""
         self.config.open_settings(self.drawer)
+        self.message.information(self.phrases.titles.info, self.phrases.info.need_restart)

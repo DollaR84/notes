@@ -62,22 +62,28 @@ class Notes:
         return {row[0]: row[1] for row in rows}
 
     def get_note(self, index):
-        """Return note title and data from database."""
-        script = 'SELECT title, data FROM notes WHERE id=?'
+        """Return note data from database."""
+        script = 'SELECT data FROM notes WHERE id=?'
         row = self.db.get(script, index)
-        return (row[0][0], row[0][1])
+        return row[0][0]
 
-    def create(self, index, parent_id, order_id):
+    def create(self, index, title, parent_id, order_id):
         """Create new row in database."""
         script = '''INSERT INTO notes (id, title, data, parent, order_sort)
                     VALUES (?, ?, "", ?, ?)'''
-        self.db.put(script, index, self.phrases.widgets.new_title, parent_id, order_id)
+        self.db.put(script, index, title, parent_id, order_id)
         self.db.commit()
 
-    def save(self, index, title, data):
-        """Save note in database."""
-        script = 'UPDATE notes SET title=?, data=? WHERE id=?'
-        self.db.put(script, title, data, index)
+    def save_title(self, index, title):
+        """Save title note in database."""
+        script = 'UPDATE notes SET title=? WHERE id=?'
+        self.db.put(script, title, index)
+        self.db.commit()
+
+    def save_data(self, index, data):
+        """Save data note in database."""
+        script = 'UPDATE notes SET data=? WHERE id=?'
+        self.db.put(script, data, index)
         self.db.commit()
 
     def del_note(self, index):
