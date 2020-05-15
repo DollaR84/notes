@@ -7,6 +7,8 @@ Created on 25.05.2019
 
 """
 
+import pickle
+
 from dialogs.dialogs import RetCode
 
 from dialogs.options import SettingsDialog
@@ -27,6 +29,7 @@ class Config(WXDB):
             self.setup_config()
 
         self.load()
+        self.set_languages()
 
     def load(self):
         """Load settings from database."""
@@ -37,13 +40,19 @@ class Config(WXDB):
             setattr(self, line[1], line[2])
             self.ids[line[1]] = line[0]
 
-    def set_languages(self, languages):
+    def set_languages(self):
         """Set all supported languages from languages pack."""
-        self.__languages = languages
+        with open('languages.dat', 'rb') as lang_file:
+            self.__languages = pickle.load(lang_file)['languages']
 
     def get_languages(self):
         """Return dict all supported languages."""
         return self.__languages
+
+    def get_language(self, code):
+        """Return dict language from code."""
+        with open('languages.dat', 'rb') as lang_file:
+            return pickle.load(lang_file)[code]
 
     def open_settings(self, parent):
         """Open settings dialog."""
