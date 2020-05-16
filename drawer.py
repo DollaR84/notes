@@ -63,7 +63,8 @@ class NotesFrame(wx.Frame):
                                 wx.TR_LINES_AT_ROOT |
                                 wx.TR_TWIST_BUTTONS |
                                 wx.TR_EDIT_LABELS)
-        self.data = wx.TextCtrl(self.panel, wx.ID_ANY, style=wx.TE_MULTILINE)
+        box_note = wx.StaticBox(self.panel, wx.ID_ANY, self.phrases.widgets.box_note)
+        self.data = wx.TextCtrl(box_note, wx.ID_ANY, style=wx.TE_MULTILINE)
         self.data.SetBackgroundColour('Yellow')
         self.but_save = wx.Button(self.panel, wx.ID_ANY, self.phrases.widgets.but_save)
         self.but_del = wx.Button(self.panel, wx.ID_ANY, self.phrases.widgets.but_del)
@@ -73,7 +74,9 @@ class NotesFrame(wx.Frame):
         left_sizer = wx.BoxSizer(wx.VERTICAL)
         left_sizer.Add(self.tree, 1, wx.EXPAND | wx.ALL, 5)
         right_sizer = wx.BoxSizer(wx.VERTICAL)
-        right_sizer.Add(self.data, 1, wx.EXPAND | wx.ALL, 5)
+        box_note_sizer = wx.StaticBoxSizer(box_note, wx.HORIZONTAL)
+        box_note_sizer.Add(self.data, 1, wx.EXPAND | wx.ALL, 5)
+        right_sizer.Add(box_note_sizer, 1, wx.EXPAND | wx.ALL)
         but_sizer = wx.GridSizer(rows=1, cols=3, hgap=5, vgap=5)
         but_sizer.Add(self.but_save, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL)
         but_sizer.Add(self.but_del, 0, wx.ALIGN_CENTER | wx.ALIGN_CENTER_VERTICAL)
