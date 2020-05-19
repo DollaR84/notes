@@ -11,8 +11,9 @@ from collections import OrderedDict
 import copy
 import webbrowser
 
-from actions import Starter
-from actions import OrderUp, OrderDown
+from actions import Actions
+from actions import CreateNote, InsertNote, SaveTitle, SaveNote, DelNote
+from actions import OrderUp, OrderDown, OrderParentUp, OrderParentDown
 from actions import SortTitle, SortChildCountUp, SortChildCountDown
 
 from api import Notes
@@ -32,11 +33,12 @@ class Commands:
         """Initialization commands class."""
         self.drawer = drawer
         self.phrases = self.drawer.phrases
-        self.config = self.drawer.config
         self.message = Message(self.drawer)
         self.notes = Notes(self.message, self.phrases)
+        self.config = self.drawer.config
+        self.config.checker(self.message, self.phrases)
         self.tree = Tree()
-        self.starter = Starter(self.tree, self.notes)
+        self.actions = Actions(self.tree, self.notes)
 
         self.set_window()
 
@@ -138,12 +140,25 @@ class Commands:
         """Set state menu items order."""
         self.drawer.order_up.Enable(state)
         self.drawer.order_down.Enable(state)
+        self.drawer.order_parent_up.Enable(state)
+        self.drawer.order_parent_down.Enable(state)
 
     def __set_state_sort_menuitem(self, state):
         """Set state menu items sort."""
         self.drawer.sort_titles.Enable(state)
         self.drawer.sort_childcount_up.Enable(state)
         self.drawer.sort_childcount_down.Enable(state)
+
+    def __set_state_undo_menuitem(self):
+        """Set menu items undo and redo."""
+        if self.actions.isUndo():
+            self.drawer.undo.Enable(True)
+        else:
+            self.drawer.undo.Enable(False)
+        if self.actions.isRedo():
+            self.drawer.redo.Enable(True)
+        else:
+            self.drawer.redo.Enable(False)
 
     def tree_select(self, event):
         """Change select item in tree."""
@@ -180,7 +195,8 @@ class Commands:
         wx_tree_id = self.drawer.tree.GetSelection()
         index = self.tree.wx_tree_id2id(wx_tree_id)
         title = event.GetLabel()
-        self.notes.save_title(index, title)
+        self.actions.run(SaveTitle(index, title))
+        self.__set_state_undo_menuitem()
 
     def text_change(self, event):
         """Change text controls note."""
@@ -194,7 +210,8 @@ class Commands:
         wx_tree_id = self.drawer.tree.GetSelection()
         index = self.tree.wx_tree_id2id(wx_tree_id)
         data = self.drawer.data.GetValue()
-        self.notes.save_data(index, data)
+        self.actions.run(SaveNote(index, data))
+        self.__set_state_undo_menuitem()
         self.drawer.but_save.Disable()
         self.drawer.save_note.Enable(False)
 
@@ -204,7 +221,8 @@ class Commands:
             index = self.tree.wx_tree_id2id(self.drawer.tree.GetSelection())
             parent_id = self.tree.get_parent_id(index)
             self.drawer.tree.DeleteAllItems()
-            self.notes.del_note(index)
+            self.actions.run(DelNote(index))
+            self.__set_state_undo_menuitem()
             self.tree.clear()
             self.init_tree()
             self.drawer.tree.SelectItem(self.tree.id2wx_tree_id(parent_id))
@@ -216,7 +234,6 @@ class Commands:
         else:
             parent_id = self.tree.wx_tree_id2id(self.drawer.tree.GetSelection())
         index = self.tree.get_count()
-        order_sort = self.tree.get_count_childs(parent_id) + 1
         parent_wx_tree_id = self.tree.id2wx_tree_id(parent_id)
         wx_tree_id = self.drawer.tree.AppendItem(parent_wx_tree_id, self.phrases.widgets.tree.new_note)
         self.drawer.tree.Expand(parent_wx_tree_id)
@@ -225,15 +242,64 @@ class Commands:
         if not self.drawer.data.IsEnabled():
             self.drawer.data.Enable()
         self.drawer.data.SetValue('')
-        self.notes.create(index, self.drawer.tree.GetItemText(wx_tree_id), parent_id, order_sort)
+        self.drawer.but_save.Disable()
+        self.drawer.save_note.Enable(False)
+        self.actions.run(CreateNote(index, self.drawer.tree.GetItemText(wx_tree_id)))
+        self.__set_state_undo_menuitem()
+
+    def insert(self, event):
+        """Insert new note."""
+        before_item = self.tree.wx_tree_id2id(self.drawer.tree.GetSelection())
+        if before_item != 0:
+            parent_id = self.tree.get_parent_id(before_item)
+            index = self.tree.get_count()
+            parent_wx_tree_id = self.tree.id2wx_tree_id(parent_id)
+            wx_tree_id = self.drawer.tree.AppendItem(parent_wx_tree_id, self.phrases.widgets.tree.new_note)
+            self.actions.run(InsertNote(index, before_item, self.drawer.tree.GetItemText(wx_tree_id)))
+            self.__set_state_undo_menuitem()
+            self.expand_tree_save()
+            self.tree.clear()
+            self.drawer.tree.DeleteAllItems()
+            self.init_tree()
+            parent_wx_tree_id = self.tree.id2wx_tree_id(parent_id)
+            self.drawer.tree.Expand(parent_wx_tree_id)
+            self.drawer.tree.SelectItem(self.tree.id2wx_tree_id(index))
+            if not self.drawer.data.IsEnabled():
+                self.drawer.data.Enable()
+            self.drawer.data.SetValue('')
+            self.drawer.but_save.Disable()
+            self.drawer.save_note.Enable(False)
+
+    def rollback(self, event):
+        """Process menu commands undo and redo."""
+        index = self.tree.wx_tree_id2id(self.drawer.tree.GetSelection())
+        parent = self.tree.get_parent_id(index)
+        if event.GetId() == self.drawer.undo.GetId():
+            self.actions.undo()
+        elif event.GetId() == self.drawer.redo.GetId():
+            self.actions.redo()
+        self.__set_state_undo_menuitem()
+        self.expand_tree_save()
+        self.tree.clear()
+        self.drawer.tree.DeleteAllItems()
+        self.init_tree()
+        select = self.tree.id2wx_tree_id(index)
+        if select is None:
+            select = self.tree.id2wx_tree_id(parent)
+        self.drawer.tree.SelectItem(select)
 
     def order(self, event):
         """Order items."""
         index = self.tree.wx_tree_id2id(self.drawer.tree.GetSelection())
         if event.GetId() == self.drawer.order_up.GetId():
-            self.starter.run(OrderUp(index))
+            self.actions.run(OrderUp(index))
         elif event.GetId() == self.drawer.order_down.GetId():
-            self.starter.run(OrderDown(index))
+            self.actions.run(OrderDown(index))
+        elif event.GetId() == self.drawer.order_parent_up.GetId():
+            self.actions.run(OrderParentUp(index))
+        elif event.GetId() == self.drawer.order_parent_down.GetId():
+            self.actions.run(OrderParentDown(index))
+        self.__set_state_undo_menuitem()
         self.expand_tree_save()
         self.tree.clear()
         self.drawer.tree.DeleteAllItems()
@@ -244,11 +310,12 @@ class Commands:
         """Sort items."""
         index = self.tree.wx_tree_id2id(self.drawer.tree.GetSelection())
         if event.GetId() == self.drawer.sort_titles.GetId():
-            self.starter.run(SortTitle(index))
+            self.actions.run(SortTitle(index))
         elif event.GetId() == self.drawer.sort_childcount_up.GetId():
-            self.starter.run(SortChildCountUp(index))
+            self.actions.run(SortChildCountUp(index))
         elif event.GetId() == self.drawer.sort_childcount_down.GetId():
-            self.starter.run(SortChildCountDown(index))
+            self.actions.run(SortChildCountDown(index))
+        self.__set_state_undo_menuitem()
         self.expand_tree_save()
         self.tree.clear()
         self.drawer.tree.DeleteAllItems()

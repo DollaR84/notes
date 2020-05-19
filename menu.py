@@ -25,8 +25,12 @@ class Menu:
 
         self.drawer.save_note.Enable(False)
         self.drawer.del_note.Enable(False)
+        self.drawer.undo.Enable(False)
+        self.drawer.redo.Enable(False)
         self.drawer.order_up.Enable(False)
         self.drawer.order_down.Enable(False)
+        self.drawer.order_parent_up.Enable(False)
+        self.drawer.order_parent_down.Enable(False)
         self.drawer.sort_titles.Enable(False)
         self.drawer.sort_childcount_up.Enable(False)
         self.drawer.sort_childcount_down.Enable(False)
@@ -36,15 +40,24 @@ class Menu:
         menu_file = wx.Menu()
         self.drawer.create_root = menu_file.Append(-1, self.phrases.menu.file.items.create_root.name, self.phrases.menu.file.items.create_root.help)
         self.drawer.create_child = menu_file.Append(-1, self.phrases.menu.file.items.create_child.name, self.phrases.menu.file.items.create_child.help)
+        self.drawer.insert = menu_file.Append(-1, self.phrases.menu.file.items.insert.name, self.phrases.menu.file.items.insert.help)
+        menu_file.AppendSeparator()
         self.drawer.save_note = menu_file.Append(-1, self.phrases.menu.file.items.save_note.name, self.phrases.menu.file.items.save_note.help)
         self.drawer.del_note = menu_file.Append(-1, self.phrases.menu.file.items.del_note.name, self.phrases.menu.file.items.del_note.help)
         menu_file.AppendSeparator()
         self.drawer.exit = menu_file.Append(-1, self.phrases.menu.file.items.exit.name, self.phrases.menu.file.items.exit.help)
 
         menu_edit = wx.Menu()
+        self.drawer.undo = menu_edit.Append(-1, self.phrases.menu.edit.items.undo.name, self.phrases.menu.edit.items.undo.help)
+        self.drawer.redo = menu_edit.Append(-1, self.phrases.menu.edit.items.redo.name, self.phrases.menu.edit.items.redo.help)
+        menu_edit.AppendSeparator()
         menu_order = wx.Menu()
         self.drawer.order_up = menu_order.Append(-1, self.phrases.menu.edit.items.order.items.up.name, self.phrases.menu.edit.items.order.items.up.help)
         self.drawer.order_down = menu_order.Append(-1, self.phrases.menu.edit.items.order.items.down.name, self.phrases.menu.edit.items.order.items.down.help)
+        menu_order_parent = wx.Menu()
+        self.drawer.order_parent_up = menu_order_parent.Append(-1, self.phrases.menu.edit.items.order.items.parent.items.up.name, self.phrases.menu.edit.items.order.items.parent.items.up.help)
+        self.drawer.order_parent_down = menu_order_parent.Append(-1, self.phrases.menu.edit.items.order.items.parent.items.down.name, self.phrases.menu.edit.items.order.items.parent.items.down.help)
+        menu_order.Append(-1, self.phrases.menu.edit.items.order.items.parent.title, menu_order_parent)
         menu_edit.Append(-1, self.phrases.menu.edit.items.order.title, menu_order)
         menu_sort = wx.Menu()
         self.drawer.sort_titles = menu_sort.Append(-1, self.phrases.menu.edit.items.sort.items.titles.name, self.phrases.menu.edit.items.sort.items.titles.help)
@@ -81,8 +94,12 @@ class Menu:
                                        (wx.ACCEL_CTRL, ord('N'), self.drawer.create_child.GetId()),
                                        (wx.ACCEL_CTRL, ord('S'), self.drawer.save_note.GetId()),
                                        (wx.ACCEL_CTRL, ord('Q'), self.drawer.exit.GetId()),
-                                       (wx.ACCEL_CTRL | wx.ACCEL_SHIFT, wx.WXK_UP, self.drawer.order_up.GetId()),
-                                       (wx.ACCEL_CTRL | wx.ACCEL_SHIFT, wx.WXK_DOWN, self.drawer.order_down.GetId()),
+                                       (wx.ACCEL_CTRL, ord('Z'), self.drawer.undo.GetId()),
+                                       (wx.ACCEL_CTRL, ord('Y'), self.drawer.redo.GetId()),
+                                       (wx.ACCEL_CTRL, wx.WXK_UP, self.drawer.order_up.GetId()),
+                                       (wx.ACCEL_CTRL, wx.WXK_DOWN, self.drawer.order_down.GetId()),
+                                       (wx.ACCEL_CTRL | wx.ACCEL_SHIFT, wx.WXK_UP, self.drawer.order_parent_up.GetId()),
+                                       (wx.ACCEL_CTRL | wx.ACCEL_SHIFT, wx.WXK_DOWN, self.drawer.order_parent_down.GetId()),
                                        (wx.ACCEL_CTRL, ord('I'), self.drawer.count_total.GetId()),
                                        (wx.ACCEL_CTRL, ord('O'), self.drawer.options.GetId()),
                                        ])
@@ -92,11 +109,16 @@ class Menu:
         """Create bindings for menu."""
         self.drawer.Bind(wx.EVT_MENU, getattr(self.command, 'create'), self.drawer.create_root)
         self.drawer.Bind(wx.EVT_MENU, getattr(self.command, 'create'), self.drawer.create_child)
+        self.drawer.Bind(wx.EVT_MENU, getattr(self.command, 'insert'), self.drawer.insert)
         self.drawer.Bind(wx.EVT_MENU, getattr(self.command, 'save'), self.drawer.save_note)
         self.drawer.Bind(wx.EVT_MENU, getattr(self.command, 'delete'), self.drawer.del_note)
         self.drawer.Bind(wx.EVT_MENU, getattr(self.command, 'close'), self.drawer.exit)
+        self.drawer.Bind(wx.EVT_MENU, getattr(self.command, 'rollback'), self.drawer.undo)
+        self.drawer.Bind(wx.EVT_MENU, getattr(self.command, 'rollback'), self.drawer.redo)
         self.drawer.Bind(wx.EVT_MENU, getattr(self.command, 'order'), self.drawer.order_up)
         self.drawer.Bind(wx.EVT_MENU, getattr(self.command, 'order'), self.drawer.order_down)
+        self.drawer.Bind(wx.EVT_MENU, getattr(self.command, 'order'), self.drawer.order_parent_up)
+        self.drawer.Bind(wx.EVT_MENU, getattr(self.command, 'order'), self.drawer.order_parent_down)
         self.drawer.Bind(wx.EVT_MENU, getattr(self.command, 'sort'), self.drawer.sort_titles)
         self.drawer.Bind(wx.EVT_MENU, getattr(self.command, 'sort'), self.drawer.sort_childcount_up)
         self.drawer.Bind(wx.EVT_MENU, getattr(self.command, 'sort'), self.drawer.sort_childcount_down)
