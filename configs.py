@@ -13,7 +13,7 @@ from dialogs.dialogs import RetCode
 
 from dialogs.options import SettingsDialog
 
-from tables import TABLES
+import tables
 
 from wxdb import WXDB
 
@@ -73,24 +73,17 @@ class Config(WXDB):
         return result
 
     def setup_config(self):
-        """Create table settings in database."""
-        table, params = tuple(DEFAULT_DATA.items())[0]
-        script = 'CREATE TABLE {} ({}) WITHOUT ROWID'.format(table,
-            ', '.join([' '.join(row) for row in TABLES[table]]))
-        self.db.put(script)
-        for substr in params:
-            script = 'INSERT INTO {} (id, name, value) VALUES ({})'.format(table, substr)
-            self.db.put(script)
-        self.db.commit()
+        """Create tables for this module."""
+        self.db.setup(tables.SETTINGS, tables.get_columns_names, DEFAULT_DATA)
 
 
 DEFAULT_DATA = {
-            "settings": [
-                         '1, "donate_url", "https://privatbank.ua/sendmoney?payment=238a49dc4f28672ee467e18c5005cdc6287ac5d9"',
-                         '2, "general_language", "ru"',
-                         '3, "general_expand", "true"'
-                        ],
-          }
+    "settings": [
+        '1, "donate_url", "https://privatbank.ua/sendmoney?payment=238a49dc4f28672ee467e18c5005cdc6287ac5d9"',
+        '2, "general_language", "ru"',
+        '3, "general_expand", "true"'
+    ],
+}
 
 
 def load(data):

@@ -79,3 +79,16 @@ class Database:
         with open(file_sql, 'r', encoding='utf-8') as sql:
             for line in sql:
                 self.cursor.execute(line)
+
+    def setup(self, tables, get_columns_names_func, default_data):
+        """Create table in database."""
+        for table, params in default_data.items():
+            script = 'CREATE TABLE {} ({}) WITHOUT ROWID'.format(table,
+                ', '.join([' '.join(row) for row in tables[table]]))
+            self.put(script)
+            for substr in params:
+                script = 'INSERT INTO {} ({}) VALUES ({})'.format(table,
+                    ', '.join(get_columns_names_func(tables[table])),
+                    substr)
+                self.put(script)
+        self.commit()

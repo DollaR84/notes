@@ -7,7 +7,13 @@ Created on 25.05.2019
 
 """
 
+import sys
+
+from converter import DBConverter
+
 from database import Database
+
+import tables
 
 
 class WXDB:
@@ -25,6 +31,20 @@ class WXDB:
     def close(self):
         """Save finish program."""
         self.db.disconnect()
+
+    def checker(self, message, phrases):
+        """Check and run if needed convert BD settings from old version to new."""
+        conv = DBConverter(self.db_name)
+        db_ver = conv.checker(self.db, tables.SETTINGS)
+        if db_ver != tables.VERSION:
+            self.db.disconnect()
+            message.information(phrases.titles.info, phrases.conv.info % (db_ver, tables.VERSION,))
+            if conv.run(tables.SETTINGS):
+                message.information(phrases.titles.info, phrases.conv.success % (tables.VERSION,))
+            else:
+                message.information(phrases.titles.error, phrases.conv.error)
+                sys.exit()
+            self.db.connect(self.db_name + '.db')
 
     def get_pos(self):
         """Return position window."""
@@ -49,16 +69,12 @@ class WXDB:
         self.db.commit()
 
     def setup_wxdb(self):
-        """Create table in database."""
-        script = '''CREATE TABLE window (
-                    id INTEGER PRIMARY KEY NOT NULL,
-                    px INTEGER NOT NULL,
-                    py INTEGER NOT NULL,
-                    sx INTEGER NOT NULL,
-                    sy INTEGER NOT NULL) WITHOUT ROWID
-                 '''
-        self.db.put(script)
-        script = '''INSERT INTO window (id, px, py, sx, sy)
-                    VALUES (1, 0, 0, 800, 600)'''
-        self.db.put(script)
-        self.db.commit()
+        """Create tables this module."""
+        self.db.setup(tables.SETTINGS, tables.get_columns_names, DEFAULT_DATA)
+
+
+DEFAULT_DATA = {
+    "window": [
+        '1, 0, 0, 480, 320',
+    ],
+}

@@ -7,6 +7,8 @@ Created on 31.05.2019
 
 """
 
+import sys
+
 from converter import DBConverter
 
 from database import Database
@@ -20,28 +22,31 @@ class Notes:
     def __init__(self, message, phrases):
         """Initialize notes class."""
         self.db_name = 'notes'
-        self.phrases = phrases
         self.db = Database()
-        self.__checker(message)
         self.db.connect(self.db_name + '.db')
 
         if not self.db.if_exists('notes'):
             self.setup()
+        else:
+            self.checker(message, phrases)
 
     def close(self):
         """Save finish program."""
         self.db.disconnect()
 
-    def __checker(self, message):
+    def checker(self, message, phrases):
         """Check and run if needed convert BD notes from old version to new."""
         conv = DBConverter(self.db_name)
-        self.db.connect(self.db_name + '.db')
-        db_ver = conv.checker(self.db)
-        self.db.disconnect()
+        db_ver = conv.checker(self.db, tables.NOTES)
         if db_ver != tables.VERSION:
-            message.information(self.phrases.titles.info, self.phrases.conv.info % (db_ver, tables.VERSION,))
-            conv.run()
-            message.information(self.phrases.titles.info, self.phrases.conv.success % (tables.VERSION,))
+            self.db.disconnect()
+            message.information(phrases.titles.info, phrases.conv.info % (db_ver, tables.VERSION,))
+            if conv.run(tables.NOTES):
+                message.information(phrases.titles.info, phrases.conv.success % (tables.VERSION,))
+            else:
+                message.information(phrases.titles.error, phrases.conv.error)
+                sys.exit()
+            self.db.connect(self.db_name + '.db')
 
     def get_titles(self):
         """Return dict titles from database."""
@@ -67,6 +72,12 @@ class Notes:
         row = self.db.get(script, index)
         return row[0][0]
 
+    def get_title(self, index):
+        """Return note title from database."""
+        script = 'SELECT title FROM notes WHERE id=?'
+        row = self.db.get(script, index)
+        return row[0][0]
+
     def create(self, index, title, parent_id, order_id):
         """Create new row in database."""
         script = '''INSERT INTO notes (id, title, data, parent, order_sort)
@@ -80,7 +91,7 @@ class Notes:
         self.db.put(script, title, index)
         self.db.commit()
 
-    def save_data(self, index, data):
+    def save_note(self, index, data):
         """Save data note in database."""
         script = 'UPDATE notes SET data=? WHERE id=?'
         self.db.put(script, data, index)
@@ -149,8 +160,12 @@ class Notes:
 
     def setup(self):
         """Create tables in database."""
-        for table in ['notes', 'expands']:
-            script = 'CREATE TABLE {} ({}) WITHOUT ROWID'.format(table,
-                ', '.join([' '.join(row) for row in tables.TABLES[table]]))
-            self.db.put(script)
-        self.db.commit()
+        self.db.setup(tables.NOTES, tables.get_columns_names, DEFAULT_DATA)
+
+
+DEFAULT_DATA = {
+    "notes": [
+    ],
+    "expands": [
+    ],
+}

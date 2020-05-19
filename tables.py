@@ -11,12 +11,22 @@ Created on 20.04.2020
 VERSION = 2
 
 
-TABLES = {
+SETTINGS = {
     "settings": [
         ["id", "INTEGER", "PRIMARY KEY", "NOT NULL"],
         ["name", "TEXT", "NOT NULL"],
         ["value", "TEXT", "NOT NULL"]
     ],
+    "window": [
+        ['id', 'INTEGER', 'PRIMARY KEY', 'NOT NULL'],
+        ['px', 'INTEGER', 'NOT NULL'],
+        ['py', 'INTEGER', 'NOT NULL'],
+        ['sx', 'INTEGER', 'NOT NULL'],
+        ['sy', 'INTEGER', 'NOT NULL']
+    ]
+}
+
+NOTES = {
     "notes": [
         ["id", "INTEGER", "PRIMARY KEY", "NOT NULL"],
         ["title", "TEXT", "NOT NULL"],
@@ -31,26 +41,26 @@ TABLES = {
 }
 
 
-def get_tables_names():
-    """Return list all tables names."""
-    return [table for table in list(TABLES.keys())]
+def get_tables_names(tables):
+    """Return list all tables names from dict."""
+    return [table for table in list(tables.keys())]
 
 
 def get_columns_names(table):
     """Return list all columns names for table."""
-    return [column[0] for column in TABLES[table]]
+    return [column[0] for column in table]
 
 
 def test():
     """print test string format from TABLES."""
     table = 'notes'
     script = 'CREATE TABLE {} ({}) WITHOUT ROWID'.format(table,
-        ', '.join([' '.join(row) for row in TABLES[table]]))
+        ', '.join([' '.join(row) for row in NOTES[table]]))
     print(script)
 
-    tables = get_tables_names()
+    tables = get_tables_names(NOTES)
     print(tables)
-    columns = get_columns_names(tables[1])
+    columns = get_columns_names(NOTES[tables[1]])
     print(columns)
 
 
