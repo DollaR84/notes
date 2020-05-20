@@ -11,10 +11,10 @@ from collections import OrderedDict
 import copy
 import webbrowser
 
-from actions import Actions
-from actions import CreateNote, InsertNote, SaveTitle, SaveNote, DelNote
-from actions import OrderUp, OrderDown, OrderParentUp, OrderParentDown
-from actions import SortTitle, SortChildCountUp, SortChildCountDown
+from actions.actions import Actions
+from actions.main import CreateNote, InsertNote, SaveTitle, SaveNote, DelNote
+from actions.order import OrderUp, OrderDown, OrderParentUp, OrderParentDown
+from actions.sort import SortTitle, SortChildCountUp, SortChildCountDown
 
 from api import Notes
 

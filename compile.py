@@ -17,7 +17,12 @@ from Cython.Distutils import build_ext
 ext_modules = [
                Extension("dialogs.dialogs", ["dialogs/dialogs.py"]),
                Extension("dialogs.options", ["dialogs/options.py"]),
-               Extension("actions", ["actions.py"]),
+               Extension("actions.actions", ["actions/actions.py"]),
+               Extension("actions.base", ["actions/base.py"]),
+               Extension("actions.history", ["actions/history.py"]),
+               Extension("actions.main", ["actions/main.py"]),
+               Extension("actions.order", ["actions/order.py"]),
+               Extension("actions.sort", ["actions/sort.py"]),
                Extension("api", ["api.py"]),
                Extension("copy", ["copy.py"]),
                Extension("commands", ["commands.py"]),
