@@ -21,7 +21,7 @@ class CreateNote(BaseAction):
     def run(self, tree, notes):
         """Running action."""
         parent_id = tree.get_parent_id(self.index)
-        order = tree.get_count_childs(parent_id) + 1
+        order = tree.get_count_childs(parent_id)
         notes.create(self.index, self.__title, parent_id, order)
 
     def undo(self, tree, notes):
