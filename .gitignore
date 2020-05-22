@@ -5,3 +5,4 @@
 *.db
 cache.dat
 __pycache__/
+old_db/
