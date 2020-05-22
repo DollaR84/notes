@@ -77,8 +77,8 @@ class Database:
     def restore(self, file_sql):
         """Restore database from sql file."""
         with open(file_sql, 'r', encoding='utf-8') as sql:
-            for line in sql:
-                self.cursor.execute(line)
+            self.cursor.executescript(sql.read())
+            self.commit()
 
     def setup(self, tables, get_columns_names_func, default_data):
         """Create table in database."""
