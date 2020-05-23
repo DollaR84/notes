@@ -26,6 +26,7 @@ class DBConverter:
 
         self.__update_functions = [
                                    'update_db2',
+                                   'update_db3',
                                   ]
 
     def __get_old_data(self, tables_list):
@@ -43,6 +44,8 @@ class DBConverter:
                 diff_columns = list(set(tables.get_columns_names(tables_dict[table])) - set(columns_db))
                 if 'order_sort' in diff_columns:
                     return 1
+                elif 'readonly' in diff_columns:
+                    return 2
                 else:
                     pass
         else:
@@ -61,13 +64,17 @@ class DBConverter:
                 result.append(item)
         return result
 
+    def __save_old_db(self, db_name, version):
+        """Saving old databases before updates."""
+        date = datetime.strftime(datetime.now(), "%d.%m.%Y")
+        os.rename(''.join([db_name, '.db']), ''.join([db_name, '.v{}.'.format(version), date, '.db']))
+
     def update_db2(self):
         """Update database tables from version database 1 to version 2."""
         self.__db.connect(self.__db_name + '.db')
         self.__get_old_data(self.__db.get_tables_names())
         self.__db.disconnect()
-        date = datetime.strftime(datetime.now(), "%d.%m.%Y")
-        os.rename(''.join([self.__db_name, '.db']), ''.join([self.__db_name, '.v1.', date, '.db']))
+        self.__save_old_db(self.__db_name, 1)
         self.__db.connect(self.__db_name + '.db')
         counter = {}
         for table, rows in self.__old_data.items():
@@ -94,6 +101,44 @@ class DBConverter:
         self.__db.commit()
         self.__db.disconnect()
 
+    def update_db3(self):
+        """Update database tables from version database 2 to version 3."""
+        self.__db.connect(self.__db_name + '.db')
+        self.__get_old_data(self.__db.get_tables_names())
+        self.__db.disconnect()
+        self.__save_old_db(self.__db_name, 2)
+        self.__db.connect(self.__db_name + '.db')
+        for table, rows in self.__old_data.items():
+            script = 'CREATE TABLE {} ({}) WITHOUT ROWID'.format(table,
+                ', '.join([' '.join(row) for row in tables.NOTES[table]]))
+            self.__db.put(script)
+            for row in rows:
+                row = self.__fix_data(row)
+                columns = tables.get_columns_names(tables.NOTES[table])
+                if table == 'notes':
+                    script = 'INSERT INTO {} ({}) VALUES ({}, 0)'.format(table,
+                        ', '.join(columns),
+                        ', '.join(row))
+                else:
+                    script = 'INSERT INTO {} ({}) VALUES ({})'.format(table,
+                        ', '.join(columns),
+                        ', '.join(row))
+                self.__db.put(script)
+        self.__db.commit()
+        self.__db.disconnect()
+
+    def check_rows(self, db, tables_dict, updates_dict):
+        """Add rows in updates databases."""
+        for table, update_dict in updates_dict.items():
+            for version, rows in update_dict.items():
+                if version <= tables.VERSION:
+                    if db.get_last_id(table) < int(rows[-1].split(', ')[0]):
+                        columns = tables.get_columns_names(tables_dict[table])
+                        for row in rows:
+                            script = 'INSERT INTO {} ({}) VALUES ({})'.format(table, ', '.join(columns), row)
+                            db.put(script)
+                        db.commit()
+
     def run(self, tables_dict):
         """Run convert data from old database to new."""
         try:
@@ -102,7 +147,8 @@ class DBConverter:
             self.__db.disconnect()
             for index in range(db_ver-1, tables.VERSION-1):
                 getattr(self, self.__update_functions[index])()
-        except:
+        except Exception as e:
+            print(e)
             return False
         return True
 

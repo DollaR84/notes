@@ -68,17 +68,31 @@ class Database:
         params = self.get_params(table)
         return [param[1] for param in params]
 
-    def dump(self, file_sql):
-        """Dump database in sql file."""
-        with open(file_sql, 'w', encoding='utf-8') as sql:
-            for line in self.conn.iterdump():
-                sql.write('%s\n' % line)
+    def get_last_id(self, table):
+        """Return last id from table."""
+        self.cursor.execute('SELECT id FROM {} ORDER BY id DESC LIMIT 1'.format(table))
+        row = self.cursor.fetchone()
+        return row[0]
 
-    def restore(self, file_sql):
+    def dump(self, filename):
+        """Dump database in sql file."""
+        with open(filename, 'w', encoding='utf-8') as sql:
+            self.dumpf(sql)
+
+    def dumpf(self, file_sql):
+        """Dump database in sql file."""
+        for line in self.conn.iterdump():
+            file_sql.write('%s\n' % line)
+
+    def restore(self, filename):
         """Restore database from sql file."""
-        with open(file_sql, 'r', encoding='utf-8') as sql:
-            self.cursor.executescript(sql.read())
-            self.commit()
+        with open(filename, 'r', encoding='utf-8') as sql:
+            self.restoref(sql)
+
+    def restoref(self, file_sql):
+        """Restore database from sql file."""
+        self.cursor.executescript(file_sql.read())
+        self.commit()
 
     def setup(self, tables, get_columns_names_func, default_data):
         """Create table in database."""

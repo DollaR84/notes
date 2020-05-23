@@ -15,6 +15,8 @@ from database import Database
 
 import tables
 
+import updates
+
 
 class WXDB:
     """Class default settings gui wx in database."""
@@ -45,6 +47,7 @@ class WXDB:
                 message.information(phrases.titles.error, phrases.conv.error)
                 sys.exit()
             self.db.connect(self.db_name + '.db')
+        conv.check_rows(self.db, tables.SETTINGS, updates.SETTINGS)
 
     def get_pos(self):
         """Return position window."""

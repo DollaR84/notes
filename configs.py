@@ -15,6 +15,8 @@ from dialogs.options import SettingsDialog
 
 import tables
 
+import updates
+
 from wxdb import WXDB
 
 
@@ -74,6 +76,8 @@ class Config(WXDB):
 
     def setup_config(self):
         """Create tables for this module."""
+        for table, rows in DEFAULT_DATA.items():
+            rows.extend([line for lst in updates.SETTINGS["settings"].values() for line in lst])
         self.db.setup(tables.SETTINGS, tables.get_columns_names, DEFAULT_DATA)
 
 

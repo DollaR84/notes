@@ -8,7 +8,7 @@ Created on 20.04.2020
 """
 
 
-VERSION = 2
+VERSION = 3
 
 
 SETTINGS = {
@@ -32,7 +32,8 @@ NOTES = {
         ["title", "TEXT", "NOT NULL"],
         ["data", "TEXT", "NOT NULL"],
         ["parent", "INTEGER", "NOT NULL"],
-        ["order_sort", "INTEGER", "NOT NULL"]
+        ["order_sort", "INTEGER", "NOT NULL"],
+        ["readonly", "INTEGER", "NOT NULL"]
     ],
     "expands": [
         ["id", "INTEGER", "PRIMARY KEY", "NOT NULL"],
