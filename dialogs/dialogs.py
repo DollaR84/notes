@@ -19,8 +19,8 @@ class TextEntryDialog(wx.Dialog):
         self.message = wx.StaticText(self, wx.ID_ANY, message,
                                      style=wx.ALIGN_LEFT)
         self.text = wx.TextCtrl(self, wx.ID_ANY, default_value)
-        but_ok = wx.Button(self, wx.ID_OK, 'Добавить')
-        but_cancel = wx.Button(self, wx.ID_CANCEL, 'Отмена')
+        but_ok = wx.Button(self, wx.ID_OK, parent.phrases.settings.save)
+        but_cancel = wx.Button(self, wx.ID_CANCEL, parent.phrases.settings.cancel)
 
         sizer_but = wx.GridSizer(rows=1, cols=2, hgap=5, vgap=5)
         sizer_but.Add(but_ok, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL)
@@ -35,6 +35,33 @@ class TextEntryDialog(wx.Dialog):
     def GetValue(self):
         """Return text entry in ctrl."""
         return self.text.GetValue()
+
+
+class TextPasswordDialog(wx.Dialog):
+    """Class for input password from user."""
+
+    def __init__(self, parent, caption, message='', default_value=''):
+        """Initialize password entry dialog."""
+        super().__init__(parent, wx.ID_ANY, caption)
+        self.message = wx.StaticText(self, wx.ID_ANY, message,
+                                     style=wx.ALIGN_LEFT)
+        self.password = wx.TextCtrl(self, wx.ID_ANY, default_value, style=wx.TE_PASSWORD)
+        but_ok = wx.Button(self, wx.ID_OK, parent.phrases.settings.save)
+        but_cancel = wx.Button(self, wx.ID_CANCEL, parent.phrases.settings.cancel)
+
+        sizer_but = wx.GridSizer(rows=1, cols=2, hgap=5, vgap=5)
+        sizer_but.Add(but_ok, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL)
+        sizer_but.Add(but_cancel, 0, wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.Add(self.message, 0, wx.ALIGN_LEFT, 5)
+        sizer.Add(self.password, 0, wx.EXPAND | wx.ALL, 5)
+        sizer.Add(sizer_but, 0, wx.EXPAND | wx.ALL, 5)
+        self.SetSizer(sizer)
+        self.Fit()
+
+    def GetValue(self):
+        """Return text entry in ctrl."""
+        return self.password.GetValue()
 
 
 class About(wx.Dialog):
