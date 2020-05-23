@@ -37,7 +37,7 @@ class TextEntryDialog(wx.Dialog):
         return self.text.GetValue()
 
 
-class TextPasswordDialog(wx.Dialog):
+class PasswordEntryDialog(wx.Dialog):
     """Class for input password from user."""
 
     def __init__(self, parent, caption, message='', default_value=''):
