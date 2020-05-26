@@ -19,8 +19,8 @@ class TextEntryDialog(wx.Dialog):
         self.message = wx.StaticText(self, wx.ID_ANY, message,
                                      style=wx.ALIGN_LEFT)
         self.text = wx.TextCtrl(self, wx.ID_ANY, default_value)
-        but_ok = wx.Button(self, wx.ID_OK, parent.phrases.settings.save)
-        but_cancel = wx.Button(self, wx.ID_CANCEL, parent.phrases.settings.cancel)
+        but_ok = wx.Button(self, wx.ID_OK, parent.phrases.dialogs.ok)
+        but_cancel = wx.Button(self, wx.ID_CANCEL, parent.phrases.dialogs.cancel)
 
         sizer_but = wx.GridSizer(rows=1, cols=2, hgap=5, vgap=5)
         sizer_but.Add(but_ok, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL)
@@ -46,8 +46,8 @@ class PasswordEntryDialog(wx.Dialog):
         self.message = wx.StaticText(self, wx.ID_ANY, message,
                                      style=wx.ALIGN_LEFT)
         self.password = wx.TextCtrl(self, wx.ID_ANY, default_value, style=wx.TE_PASSWORD)
-        but_ok = wx.Button(self, wx.ID_OK, parent.phrases.settings.save)
-        but_cancel = wx.Button(self, wx.ID_CANCEL, parent.phrases.settings.cancel)
+        but_ok = wx.Button(self, wx.ID_OK, parent.phrases.dialogs.ok)
+        but_cancel = wx.Button(self, wx.ID_CANCEL, parent.phrases.dialogs.cancel)
 
         sizer_but = wx.GridSizer(rows=1, cols=2, hgap=5, vgap=5)
         sizer_but.Add(but_ok, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL)
@@ -70,13 +70,10 @@ class About(wx.Dialog):
     def __init__(self, parent, caption, name, version, author):
         """Initialize dialog about form."""
         super().__init__(parent, wx.ID_ANY, caption)
-        self.name = wx.StaticText(self, wx.ID_ANY, '"%s"' % name,
-                                  style=wx.ALIGN_LEFT)
-        self.version = wx.StaticText(self, wx.ID_ANY, 'Версия: %s' % version,
-                                     style=wx.ALIGN_LEFT)
-        self.author = wx.StaticText(self, wx.ID_ANY, 'Автор: %s' % author,
-                                    style=wx.ALIGN_LEFT)
-        close = wx.Button(self, wx.ID_OK, 'Закрыть')
+        self.name = wx.StaticText(self, wx.ID_ANY, '"{}"'.format(name), style=wx.ALIGN_LEFT)
+        self.version = wx.StaticText(self, wx.ID_ANY, '{}: {}'.format(parent.phrases.dialogs.version, version), style=wx.ALIGN_LEFT)
+        self.author = wx.StaticText(self, wx.ID_ANY, '{}: {}'.format(parent.phrases.dialogs.author, author), style=wx.ALIGN_LEFT)
+        close = wx.Button(self, wx.ID_OK, parent.phrases.dialogs.close)
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(self.name, 0, wx.ALIGN_LEFT, 5)
@@ -121,6 +118,7 @@ class Message:
         dlg = wx.MessageDialog(self.parent, message, title,
                                style=wx.YES_NO | wx.NO_DEFAULT |
                                wx.ICON_QUESTION)
+        dlg.SetYesNoLabels(self.parent.phrases.dialogs.yes, self.parent.phrases.dialogs.no)
         if wx.ID_YES == dlg.ShowModal():
             ret_code = True
         dlg.Destroy()
