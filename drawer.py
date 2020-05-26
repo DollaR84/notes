@@ -54,6 +54,7 @@ class NotesFrame(wx.Frame):
         self.command.init_tree()
         self.but_save.Disable()
         self.but_del.Disable()
+        self.readonly.Disable()
 
     def __create_widgets(self):
         """Create widgets program."""
@@ -66,6 +67,7 @@ class NotesFrame(wx.Frame):
         box_note = wx.StaticBox(self.panel, wx.ID_ANY, self.phrases.widgets.box_note)
         self.data = wx.TextCtrl(box_note, wx.ID_ANY, style=wx.TE_MULTILINE)
         self.data.SetBackgroundColour('Yellow')
+        self.readonly = wx.CheckBox(self.panel, wx.ID_ANY, self.phrases.widgets.readonly)
         self.but_save = wx.Button(self.panel, wx.ID_ANY, self.phrases.widgets.but_save)
         self.but_del = wx.Button(self.panel, wx.ID_ANY, self.phrases.widgets.but_del)
         self.but_create = wx.Button(self.panel, wx.ID_ANY, self.phrases.widgets.but_create)
@@ -77,6 +79,7 @@ class NotesFrame(wx.Frame):
         box_note_sizer = wx.StaticBoxSizer(box_note, wx.HORIZONTAL)
         box_note_sizer.Add(self.data, 1, wx.EXPAND | wx.ALL, 5)
         right_sizer.Add(box_note_sizer, 1, wx.EXPAND | wx.ALL)
+        right_sizer.Add(self.readonly, 0, wx.EXPAND | wx.ALL | wx.ALIGN_LEFT, 5)
         but_sizer = wx.GridSizer(rows=1, cols=3, hgap=5, vgap=5)
         but_sizer.Add(self.but_save, 0, wx.ALIGN_LEFT | wx.ALIGN_CENTER_VERTICAL)
         but_sizer.Add(self.but_del, 0, wx.ALIGN_CENTER | wx.ALIGN_CENTER_VERTICAL)
@@ -93,6 +96,7 @@ class NotesFrame(wx.Frame):
         self.Bind(wx.EVT_TREE_ITEM_ACTIVATED, getattr(self.command, 'tree_activated'), self.tree)
         self.Bind(wx.EVT_TREE_END_LABEL_EDIT, getattr(self.command, 'tree_end_edit'), self.tree)
         self.Bind(wx.EVT_TEXT, getattr(self.command, 'text_change'), self.data)
+        self.Bind(wx.EVT_CHECKBOX, getattr(self.command, 'change_readonly'), self.readonly)
         self.Bind(wx.EVT_BUTTON, getattr(self.command, 'save'), self.but_save)
         self.Bind(wx.EVT_BUTTON, getattr(self.command, 'delete'), self.but_del)
         self.Bind(wx.EVT_BUTTON, getattr(self.command, 'create'), self.but_create)

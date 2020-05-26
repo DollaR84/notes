@@ -9,6 +9,7 @@ Created on 25.05.2019
 
 from collections import OrderedDict
 import copy
+import hashlib
 import webbrowser
 
 from actions.actions import Actions
@@ -20,6 +21,8 @@ from api import Notes
 
 from dialogs.dialogs import About
 from dialogs.dialogs import Message
+from dialogs.dialogs import PasswordEntryDialog
+from dialogs.dialogs import RetCode
 
 from tree import Tree
 
@@ -160,34 +163,52 @@ class Commands:
         else:
             self.drawer.redo.Enable(False)
 
+    def __set_state_del(self, state):
+        """Set state to delete button and delete menu item."""
+        self.drawer.but_del.Enable(state)
+        self.drawer.del_note.Enable(state)
+
+    def __disable_widgets(self):
+        """Disable state for all widgets."""
+        self.__set_state_del(False)
+        self.drawer.readonly.Enable(False)
+        self.drawer.data.SetValue('')
+        self.drawer.data.Disable()
+
     def tree_select(self, event):
         """Change select item in tree."""
         index = self.tree.wx_tree_id2id(self.drawer.tree.GetSelection())
         if index is None:
             self.__set_state_order_menuitem(False)
             self.__set_state_sort_menuitem(False)
+            self.__disable_widgets()
+            self.drawer.but_create.Disable()
+            self.drawer.create_child.Enable(False)
         elif index == 0:
             self.__set_state_order_menuitem(False)
             self.__set_state_sort_menuitem(True)
-            self.drawer.but_del.Disable()
-            self.drawer.del_note.Enable(False)
-            self.drawer.data.SetValue('')
-            self.drawer.data.Disable()
+            self.__disable_widgets()
+            self.drawer.but_create.Enable(True)
+            self.drawer.create_child.Enable(True)
         else:
             self.__set_state_order_menuitem(True)
             self.__set_state_sort_menuitem(True)
-            self.drawer.but_del.Enable()
-            self.drawer.del_note.Enable(True)
             self.drawer.data.Enable()
             data = self.notes.get_note(index)
             self.drawer.data.SetValue(data)
+            self.drawer.readonly.Enable(True)
+            readonly = self.notes.get_readonly(index)
+            self.drawer.readonly.SetValue(readonly)
+            self.__set_state_text_note(readonly)
+            self.__set_state_del(not readonly)
         self.drawer.but_save.Disable()
         self.drawer.save_note.Enable(False)
 
     def tree_activated(self, event):
         """Activated edit label on tree item."""
         index = self.tree.wx_tree_id2id(self.drawer.tree.GetSelection())
-        if index != 0:
+        readonly = True if self.drawer.readonly.GetValue() and (not self.__check_password()) else False
+        if (index != 0) and (not readonly):
             self.drawer.tree.EditLabel(event.GetItem())
 
     def tree_end_edit(self, event):
@@ -204,6 +225,41 @@ class Commands:
         if index != 0:
             self.drawer.but_save.Enable()
             self.drawer.save_note.Enable(True)
+
+    def __set_state_text_note(self, readonly):
+        """Set data text control note readonly state."""
+        state = not readonly
+        self.drawer.data.SetEditable(state)
+
+    def __check_password(self):
+        """Check state readonly password."""
+        result = True
+        password_chk = True if self.config.readonly_password_check == "true" else False
+        if password_chk:
+            dlg = PasswordEntryDialog(self.drawer, self.drawer.phrases.titles.password)
+            if RetCode.OK == dlg.ShowModal():
+                hashpass= hashlib.sha1(dlg.GetValue().encode("utf-8"))
+                if hashpass.hexdigest() != self.config.readonly_password:
+                    result = False
+            else:
+                result = False
+            dlg.Destroy()
+        return result
+
+    def change_readonly(self, event):
+        """Change readonly attribute for note."""
+        index = self.tree.wx_tree_id2id(self.drawer.tree.GetSelection())
+        readonly = self.drawer.readonly.GetValue()
+        if readonly:
+            self.notes.save_readonly(index, readonly)
+            self.__set_state_text_note(readonly)
+            self.__set_state_del(not readonly)
+        elif self.__check_password():
+            self.notes.save_readonly(index, readonly)
+            self.__set_state_text_note(readonly)
+            self.__set_state_del(not readonly)
+        else:
+            self.drawer.readonly.SetValue(True)
 
     def save(self, event):
         """Save data note in database."""
