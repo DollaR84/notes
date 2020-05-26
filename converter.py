@@ -31,6 +31,7 @@ class DBConverter:
         self.__update_functions = [
                                    'update_db2',
                                    'update_db3',
+                                   'update_db4',
                                   ]
 
     def __get_old_data(self, tables_list):
@@ -50,6 +51,8 @@ class DBConverter:
                     return 1
                 elif 'readonly' in diff_columns:
                     return 2
+                elif ('date_create' in diff_columns) and ('date_update' in diff_columns):
+                    return 3
                 else:
                     pass
         else:
@@ -69,12 +72,12 @@ class DBConverter:
         self.__save_old_db(self.__db_name, 1)
         self.__db.connect(self.__db_name + '.db')
         tables_dict = deepcopy(tables.NOTES)
-        counter = {}
         for table, rows in self.__old_data.items():
             tables_dict[table].extend(updates.columns(table, 2))
             script = 'CREATE TABLE {} ({}) WITHOUT ROWID'.format(table,
                 ', '.join([' '.join(row) for row in tables_dict[table]]))
             self.__db.put(script)
+            counter = {}
             for row in rows:
                 columns = tables.get_columns_names(tables_dict[table])
                 if table == 'notes':
@@ -111,6 +114,33 @@ class DBConverter:
                 columns = tables.get_columns_names(tables_dict[table])
                 if table == 'notes':
                     script = 'INSERT INTO {} ({}) VALUES ({}, 0)'.format(table,
+                        ', '.join(columns),
+                        ', '.join(['?' for _ in range(len(row))]))
+                else:
+                    script = 'INSERT INTO {} ({}) VALUES ({})'.format(table,
+                        ', '.join(columns),
+                        ', '.join(['?' for _ in range(len(row))]))
+                self.__db.put(script, *row)
+        self.__db.commit()
+        self.__db.disconnect()
+
+    def update_db4(self):
+        """Update database tables from version database 3 to version 4."""
+        self.__db.connect(self.__db_name + '.db')
+        self.__get_old_data(self.__db.get_tables_names())
+        self.__db.disconnect()
+        self.__save_old_db(self.__db_name, 3)
+        self.__db.connect(self.__db_name + '.db')
+        tables_dict = deepcopy(tables.NOTES)
+        for table, rows in self.__old_data.items():
+            tables_dict[table].extend(updates.columns_all(table, 4))
+            script = 'CREATE TABLE {} ({}) WITHOUT ROWID'.format(table,
+                ', '.join([' '.join(row) for row in tables_dict[table]]))
+            self.__db.put(script)
+            for row in rows:
+                columns = tables.get_columns_names(tables_dict[table])
+                if table == 'notes':
+                    script = 'INSERT INTO {} ({}) VALUES ({}, "", "")'.format(table,
                         ', '.join(columns),
                         ', '.join(['?' for _ in range(len(row))]))
                 else:
