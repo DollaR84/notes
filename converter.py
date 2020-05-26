@@ -7,13 +7,17 @@ Created on 19.04.2020
 
 """
 
-import os
+from copy import deepcopy
 
 from datetime import datetime
+
+import os
 
 from database import Database
 
 import tables
+
+import updates
 
 
 class DBConverter:
@@ -76,14 +80,16 @@ class DBConverter:
         self.__db.disconnect()
         self.__save_old_db(self.__db_name, 1)
         self.__db.connect(self.__db_name + '.db')
+        tables_dict = deepcopy(tables.NOTES)
         counter = {}
         for table, rows in self.__old_data.items():
+            tables_dict[table].extend(updates.columns(table, 2))
             script = 'CREATE TABLE {} ({}) WITHOUT ROWID'.format(table,
-                ', '.join([' '.join(row) for row in tables.NOTES[table]]))
+                ', '.join([' '.join(row) for row in tables_dict[table]]))
             self.__db.put(script)
             for row in rows:
                 row = self.__fix_data(row)
-                columns = tables.get_columns_names(tables.NOTES[table])
+                columns = tables.get_columns_names(tables_dict[table])
                 if table == 'notes':
                     parent = row[-1]
                     if parent not in counter:
@@ -108,13 +114,15 @@ class DBConverter:
         self.__db.disconnect()
         self.__save_old_db(self.__db_name, 2)
         self.__db.connect(self.__db_name + '.db')
+        tables_dict = deepcopy(tables.NOTES)
         for table, rows in self.__old_data.items():
+            tables_dict[table].extend(updates.columns_all(table, 3))
             script = 'CREATE TABLE {} ({}) WITHOUT ROWID'.format(table,
-                ', '.join([' '.join(row) for row in tables.NOTES[table]]))
+                ', '.join([' '.join(row) for row in tables_dict[table]]))
             self.__db.put(script)
             for row in rows:
                 row = self.__fix_data(row)
-                columns = tables.get_columns_names(tables.NOTES[table])
+                columns = tables.get_columns_names(tables_dict[table])
                 if table == 'notes':
                     script = 'INSERT INTO {} ({}) VALUES ({}, 0)'.format(table,
                         ', '.join(columns),
@@ -127,9 +135,10 @@ class DBConverter:
         self.__db.commit()
         self.__db.disconnect()
 
-    def check_rows(self, db, tables_dict, updates_dict):
+    def check_rows(self, db, tables_dict):
         """Add rows in updates databases."""
-        for table, update_dict in updates_dict.items():
+        for table in list(tables_dict.keys()):
+            update_dict = updates.ROWS.get(table, {})
             for version, rows in update_dict.items():
                 if version <= tables.VERSION:
                     if db.get_last_id(table) < int(rows[-1].split(', ')[0]):
