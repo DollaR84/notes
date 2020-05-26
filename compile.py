@@ -33,9 +33,13 @@ ext_modules = [
                Extension("database", ["database.py"]),
                Extension("tables", ["tables.py"]),
                Extension("tree", ["tree.py"]),
+               Extension("updates", ["updates.py"]),
                Extension("version", ["version.py"]),
                Extension("wxdb", ["wxdb.py"])
               ]
+
+for e in ext_modules:
+    e.cython_directives = {'language_level': "3"} #all are Python-3
 
 setup(
       name='main',
