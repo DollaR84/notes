@@ -56,18 +56,6 @@ class DBConverter:
             pass
         return tables.VERSION
 
-    def __fix_data(self, row):
-        """Fix data items from rows database."""
-        result = []
-        for item in row:
-            if isinstance(item, int):
-                result.append(str(item))
-            elif isinstance(item, str):
-                result.append('"{}"'.format(item))
-            else:
-                result.append(item)
-        return result
-
     def __save_old_db(self, db_name, version):
         """Saving old databases before updates."""
         date = datetime.strftime(datetime.now(), "%d.%m.%Y")
@@ -88,7 +76,6 @@ class DBConverter:
                 ', '.join([' '.join(row) for row in tables_dict[table]]))
             self.__db.put(script)
             for row in rows:
-                row = self.__fix_data(row)
                 columns = tables.get_columns_names(tables_dict[table])
                 if table == 'notes':
                     parent = row[-1]
@@ -97,13 +84,13 @@ class DBConverter:
                     counter[parent] += 1
                     script = 'INSERT INTO {} ({}) VALUES ({}, {})'.format(table,
                         ', '.join(columns),
-                        ', '.join(row),
+                        ', '.join(['?' for _ in range(len(row))]),
                         counter[parent])
                 else:
                     script = 'INSERT INTO {} ({}) VALUES ({})'.format(table,
                         ', '.join(columns),
-                        ', '.join(row))
-                self.__db.put(script)
+                        ', '.join(['?' for _ in range(len(row))]))
+                self.__db.put(script, *row)
         self.__db.commit()
         self.__db.disconnect()
 
@@ -121,17 +108,16 @@ class DBConverter:
                 ', '.join([' '.join(row) for row in tables_dict[table]]))
             self.__db.put(script)
             for row in rows:
-                row = self.__fix_data(row)
                 columns = tables.get_columns_names(tables_dict[table])
                 if table == 'notes':
                     script = 'INSERT INTO {} ({}) VALUES ({}, 0)'.format(table,
                         ', '.join(columns),
-                        ', '.join(row))
+                        ', '.join(['?' for _ in range(len(row))]))
                 else:
                     script = 'INSERT INTO {} ({}) VALUES ({})'.format(table,
                         ', '.join(columns),
-                        ', '.join(row))
-                self.__db.put(script)
+                        ', '.join(['?' for _ in range(len(row))]))
+                self.__db.put(script, *row)
         self.__db.commit()
         self.__db.disconnect()
 
