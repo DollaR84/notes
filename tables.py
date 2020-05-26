@@ -8,7 +8,7 @@ Created on 20.04.2020
 """
 
 
-VERSION = 3
+VERSION = 4
 
 
 SETTINGS = {

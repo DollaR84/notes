@@ -20,6 +20,10 @@ COLUMNS = {
         (3, [
             ["readonly", "INTEGER", "NOT NULL"],
         ]),
+        (4, [
+            ["date_create", "TEXT", "NOT NULL"],
+            ["date_update", "TEXT", "NOT NULL"],
+        ]),
     ])
 }
 
