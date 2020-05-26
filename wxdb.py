@@ -36,18 +36,19 @@ class WXDB:
 
     def checker(self, message, phrases):
         """Check and run if needed convert BD settings from old version to new."""
+        tables_dict, _ = updates.update(tables.SETTINGS, DEFAULT_DATA)
         conv = DBConverter(self.db_name)
-        db_ver = conv.checker(self.db, tables.SETTINGS)
+        db_ver = conv.checker(self.db, tables_dict)
         if db_ver != tables.VERSION:
             self.db.disconnect()
             message.information(phrases.titles.info, phrases.conv.info % (db_ver, tables.VERSION,))
-            if conv.run(tables.SETTINGS):
+            if conv.run(tables_dict):
                 message.information(phrases.titles.info, phrases.conv.success % (tables.VERSION,))
             else:
                 message.information(phrases.titles.error, phrases.conv.error)
                 sys.exit()
             self.db.connect(self.db_name + '.db')
-        conv.check_rows(self.db, tables.SETTINGS, updates.SETTINGS)
+        conv.check_rows(self.db, tables_dict)
 
     def get_pos(self):
         """Return position window."""
@@ -73,11 +74,12 @@ class WXDB:
 
     def setup_wxdb(self):
         """Create tables this module."""
-        self.db.setup(tables.SETTINGS, tables.get_columns_names, DEFAULT_DATA)
+        tables_dict, default_data = updates.update(tables.SETTINGS, DEFAULT_DATA)
+        self.db.setup(tables_dict, tables.get_columns_names, default_data)
 
 
 DEFAULT_DATA = {
     "window": [
-        '1, 0, 0, 480, 320',
+        '1, 0, 0, 600, 400',
     ],
 }

@@ -15,6 +15,8 @@ from database import Database
 
 import tables
 
+import updates
+
 
 class Notes:
     """Api class for work notes."""
@@ -36,12 +38,13 @@ class Notes:
 
     def checker(self, message, phrases):
         """Check and run if needed convert BD notes from old version to new."""
+        tables_dict, _ = updates.update(tables.NOTES, DEFAULT_DATA)
         conv = DBConverter(self.db_name)
-        db_ver = conv.checker(self.db, tables.NOTES)
+        db_ver = conv.checker(self.db, tables_dict)
         if db_ver != tables.VERSION:
             self.db.disconnect()
             message.information(phrases.titles.info, phrases.conv.info % (db_ver, tables.VERSION,))
-            if conv.run(tables.NOTES):
+            if conv.run(tables_dict):
                 message.information(phrases.titles.info, phrases.conv.success % (tables.VERSION,))
             else:
                 message.information(phrases.titles.error, phrases.conv.error)
@@ -78,10 +81,16 @@ class Notes:
         row = self.db.get(script, index)
         return row[0][0]
 
+    def get_readonly(self, index):
+        """Return note readonly attribute from database."""
+        script = 'SELECT readonly FROM notes WHERE id=?'
+        row = self.db.get(script, index)
+        return bool(row[0][0])
+
     def create(self, index, title, parent_id, order_id):
         """Create new row in database."""
-        script = '''INSERT INTO notes (id, title, data, parent, order_sort)
-                    VALUES (?, ?, "", ?, ?)'''
+        columns = self.db.get_columns_names('notes')
+        script = 'INSERT INTO notes ({}) VALUES (?, ?, "", ?, ?, 0)'.format(', '.join(columns))
         self.db.put(script, index, title, parent_id, order_id)
         self.db.commit()
 
@@ -95,6 +104,13 @@ class Notes:
         """Save data note in database."""
         script = 'UPDATE notes SET data=? WHERE id=?'
         self.db.put(script, data, index)
+        self.db.commit()
+
+    def save_readonly(self, index, state):
+        """Save readonly attribute note in database."""
+        script = 'UPDATE notes SET readonly=? WHERE id=?'
+        value = 1 if state else 0
+        self.db.put(script, value, index)
         self.db.commit()
 
     def del_note(self, index):
@@ -160,7 +176,8 @@ class Notes:
 
     def setup(self):
         """Create tables in database."""
-        self.db.setup(tables.NOTES, tables.get_columns_names, DEFAULT_DATA)
+        tables_dict, default_data = updates.update(tables.NOTES, DEFAULT_DATA)
+        self.db.setup(tables_dict, tables.get_columns_names, default_data)
 
 
 DEFAULT_DATA = {
