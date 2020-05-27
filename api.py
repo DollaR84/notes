@@ -7,6 +7,7 @@ Created on 31.05.2019
 
 """
 
+from datetime import datetime
 import sys
 
 from converter import DBConverter
@@ -89,21 +90,24 @@ class Notes:
 
     def create(self, index, title, parent_id, order_id):
         """Create new row in database."""
+        date = datetime.strftime(datetime.now(), "%d.%m.%Y")
         columns = self.db.get_columns_names('notes')
-        script = 'INSERT INTO notes ({}) VALUES (?, ?, "", ?, ?, 0)'.format(', '.join(columns))
-        self.db.put(script, index, title, parent_id, order_id)
+        script = 'INSERT INTO notes ({}) VALUES (?, ?, "", ?, ?, 0, ?, ?)'.format(', '.join(columns))
+        self.db.put(script, index, title, parent_id, order_id, date, date)
         self.db.commit()
 
     def save_title(self, index, title):
         """Save title note in database."""
-        script = 'UPDATE notes SET title=? WHERE id=?'
-        self.db.put(script, title, index)
+        date = datetime.strftime(datetime.now(), "%d.%m.%Y")
+        script = 'UPDATE notes SET title=?, date_update=? WHERE id=?'
+        self.db.put(script, title, date, index)
         self.db.commit()
 
     def save_note(self, index, data):
         """Save data note in database."""
-        script = 'UPDATE notes SET data=? WHERE id=?'
-        self.db.put(script, data, index)
+        date = datetime.strftime(datetime.now(), "%d.%m.%Y")
+        script = 'UPDATE notes SET data=?, date_update=? WHERE id=?'
+        self.db.put(script, data, date, index)
         self.db.commit()
 
     def save_readonly(self, index, state):
@@ -157,6 +161,12 @@ class Notes:
             script = 'UPDATE notes SET parent=?, order_sort=? WHERE id=?'
             self.db.put(script, value[0], value[1], index)
             self.db.commit()
+
+    def get_date(self, index):
+        """Return date create and date update note."""
+        script = 'SELECT date_create, date_update FROM notes WHERE id=?'
+        row = self.db.get(script, index)
+        return (row[0][0], row[0][1])
 
     def get_expands(self):
         """Return dict all expand rows."""

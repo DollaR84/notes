@@ -34,6 +34,7 @@ class Menu:
         self.drawer.sort_titles.Enable(False)
         self.drawer.sort_childcount_up.Enable(False)
         self.drawer.sort_childcount_down.Enable(False)
+        self.drawer.info_date.Enable(False)
 
     def __create_menu(self):
         """Create menu program."""
@@ -71,6 +72,8 @@ class Menu:
         self.drawer.count_root = menu_info.Append(-1, self.phrases.menu.info.items.count_root.name, self.phrases.menu.info.items.count_root.help)
         self.drawer.count_child = menu_info.Append(-1, self.phrases.menu.info.items.count_child.name, self.phrases.menu.info.items.count_child.help)
         self.drawer.count_total = menu_info.Append(-1, self.phrases.menu.info.items.count_total.name, self.phrases.menu.info.items.count_total.help)
+        menu_info.AppendSeparator()
+        self.drawer.info_date = menu_info.Append(-1, self.phrases.menu.info.items.date.name, self.phrases.menu.info.items.date.help)
 
         menu_options = wx.Menu()
         self.drawer.options = menu_options.Append(-1, self.phrases.menu.options.items.settings.name, self.phrases.menu.options.items.settings.help)
@@ -125,6 +128,7 @@ class Menu:
         self.drawer.Bind(wx.EVT_MENU, getattr(self.command, 'count'), self.drawer.count_root)
         self.drawer.Bind(wx.EVT_MENU, getattr(self.command, 'count'), self.drawer.count_child)
         self.drawer.Bind(wx.EVT_MENU, getattr(self.command, 'count'), self.drawer.count_total)
+        self.drawer.Bind(wx.EVT_MENU, getattr(self.command, 'info_date'), self.drawer.info_date)
         self.drawer.Bind(wx.EVT_MENU, getattr(self.command, 'options'), self.drawer.options)
         self.drawer.Bind(wx.EVT_MENU, getattr(self.command, 'donate'), self.drawer.donate)
         self.drawer.Bind(wx.EVT_MENU, getattr(self.command, 'home'), self.drawer.home)

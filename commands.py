@@ -184,15 +184,18 @@ class Commands:
             self.__disable_widgets()
             self.drawer.but_create.Disable()
             self.drawer.create_child.Enable(False)
+            self.drawer.info_date.Enable(False)
         elif index == 0:
             self.__set_state_order_menuitem(False)
             self.__set_state_sort_menuitem(True)
             self.__disable_widgets()
             self.drawer.but_create.Enable(True)
             self.drawer.create_child.Enable(True)
+            self.drawer.info_date.Enable(False)
         else:
             self.__set_state_order_menuitem(True)
             self.__set_state_sort_menuitem(True)
+            self.drawer.info_date.Enable(True)
             self.drawer.data.Enable()
             data = self.notes.get_note(index)
             self.drawer.data.SetValue(data)
@@ -387,6 +390,14 @@ class Commands:
             self.message.information(self.phrases.titles.info, self.phrases.info.count.child % self.tree.get_count_childs(index))
         else:
             self.message.information(self.phrases.titles.info, self.phrases.info.count.total % (self.tree.get_count() - 1))
+
+    def info_date(self, event):
+        """Show info of date create and date update note."""
+        index = self.tree.wx_tree_id2id(self.drawer.tree.GetSelection())
+        date_create, date_update = self.notes.get_date(index)
+        create = self.phrases.info.date.create.format(date_create)
+        update = self.phrases.info.date.update.format(date_update)
+        self.message.information(self.phrases.titles.info, '\n'.join([create, update]))
 
     def options(self, event):
         """Run settings dialog."""
