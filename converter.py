@@ -8,9 +8,7 @@ Created on 19.04.2020
 """
 
 from copy import deepcopy
-
 from datetime import datetime
-
 import os
 
 from database import Database
@@ -64,92 +62,68 @@ class DBConverter:
         date = datetime.strftime(datetime.now(), "%d.%m.%Y")
         os.rename(''.join([db_name, '.db']), ''.join([db_name, '.v{}.'.format(version), date, '.db']))
 
-    def update_db2(self):
+    def update_db(self, db_ver, tables_dict_default, update_func):
+        """Run update database tables."""
+        self.__db.connect(self.__db_name + '.db')
+        self.__get_old_data(self.__db.get_tables_names())
+        self.__db.disconnect()
+        self.__save_old_db(self.__db_name, db_ver)
+        self.__db.connect(self.__db_name + '.db')
+        tables_dict = deepcopy(tables_dict_default)
+        for table, rows in self.__old_data.items():
+            tables_dict[table].extend(updates.columns_all(table, db_ver+1))
+            script = 'CREATE TABLE {} ({}) WITHOUT ROWID'.format(table,
+                ', '.join([' '.join(row) for row in tables_dict[table]]))
+            self.__db.put(script)
+            columns = tables.get_columns_names(tables_dict[table])
+            update_func(table, columns, rows)
+        self.__db.commit()
+        self.__db.disconnect()
+
+    def update_db2(self, table, columns, rows):
         """Update database tables from version database 1 to version 2."""
-        self.__db.connect(self.__db_name + '.db')
-        self.__get_old_data(self.__db.get_tables_names())
-        self.__db.disconnect()
-        self.__save_old_db(self.__db_name, 1)
-        self.__db.connect(self.__db_name + '.db')
-        tables_dict = deepcopy(tables.NOTES)
-        for table, rows in self.__old_data.items():
-            tables_dict[table].extend(updates.columns(table, 2))
-            script = 'CREATE TABLE {} ({}) WITHOUT ROWID'.format(table,
-                ', '.join([' '.join(row) for row in tables_dict[table]]))
-            self.__db.put(script)
-            counter = {}
-            for row in rows:
-                columns = tables.get_columns_names(tables_dict[table])
-                if table == 'notes':
-                    parent = row[-1]
-                    if parent not in counter:
-                        counter[parent] = 0
-                    counter[parent] += 1
-                    script = 'INSERT INTO {} ({}) VALUES ({}, {})'.format(table,
-                        ', '.join(columns),
-                        ', '.join(['?' for _ in range(len(row))]),
-                        counter[parent])
-                else:
-                    script = 'INSERT INTO {} ({}) VALUES ({})'.format(table,
-                        ', '.join(columns),
-                        ', '.join(['?' for _ in range(len(row))]))
-                self.__db.put(script, *row)
-        self.__db.commit()
-        self.__db.disconnect()
+        counter = {}
+        for row in rows:
+            if table == 'notes':
+                parent = row[-1]
+                if parent not in counter:
+                    counter[parent] = 0
+                counter[parent] += 1
+                script = 'INSERT INTO {} ({}) VALUES ({}, {})'.format(table,
+                    ', '.join(columns),
+                    ', '.join(['?' for _ in range(len(row))]),
+                    counter[parent])
+            else:
+                script = 'INSERT INTO {} ({}) VALUES ({})'.format(table,
+                    ', '.join(columns),
+                    ', '.join(['?' for _ in range(len(row))]))
+            self.__db.put(script, *row)
 
-    def update_db3(self):
+    def update_db3(self, table, columns, rows):
         """Update database tables from version database 2 to version 3."""
-        self.__db.connect(self.__db_name + '.db')
-        self.__get_old_data(self.__db.get_tables_names())
-        self.__db.disconnect()
-        self.__save_old_db(self.__db_name, 2)
-        self.__db.connect(self.__db_name + '.db')
-        tables_dict = deepcopy(tables.NOTES)
-        for table, rows in self.__old_data.items():
-            tables_dict[table].extend(updates.columns_all(table, 3))
-            script = 'CREATE TABLE {} ({}) WITHOUT ROWID'.format(table,
-                ', '.join([' '.join(row) for row in tables_dict[table]]))
-            self.__db.put(script)
-            for row in rows:
-                columns = tables.get_columns_names(tables_dict[table])
-                if table == 'notes':
-                    script = 'INSERT INTO {} ({}) VALUES ({}, 0)'.format(table,
-                        ', '.join(columns),
-                        ', '.join(['?' for _ in range(len(row))]))
-                else:
-                    script = 'INSERT INTO {} ({}) VALUES ({})'.format(table,
-                        ', '.join(columns),
-                        ', '.join(['?' for _ in range(len(row))]))
-                self.__db.put(script, *row)
-        self.__db.commit()
-        self.__db.disconnect()
+        for row in rows:
+            if table == 'notes':
+                script = 'INSERT INTO {} ({}) VALUES ({}, 0)'.format(table,
+                    ', '.join(columns),
+                    ', '.join(['?' for _ in range(len(row))]))
+            else:
+                script = 'INSERT INTO {} ({}) VALUES ({})'.format(table,
+                    ', '.join(columns),
+                    ', '.join(['?' for _ in range(len(row))]))
+            self.__db.put(script, *row)
 
-    def update_db4(self):
+    def update_db4(self, table, columns, rows):
         """Update database tables from version database 3 to version 4."""
-        self.__db.connect(self.__db_name + '.db')
-        self.__get_old_data(self.__db.get_tables_names())
-        self.__db.disconnect()
-        self.__save_old_db(self.__db_name, 3)
-        self.__db.connect(self.__db_name + '.db')
-        tables_dict = deepcopy(tables.NOTES)
-        for table, rows in self.__old_data.items():
-            tables_dict[table].extend(updates.columns_all(table, 4))
-            script = 'CREATE TABLE {} ({}) WITHOUT ROWID'.format(table,
-                ', '.join([' '.join(row) for row in tables_dict[table]]))
-            self.__db.put(script)
-            for row in rows:
-                columns = tables.get_columns_names(tables_dict[table])
-                if table == 'notes':
-                    script = 'INSERT INTO {} ({}) VALUES ({}, "", "")'.format(table,
-                        ', '.join(columns),
-                        ', '.join(['?' for _ in range(len(row))]))
-                else:
-                    script = 'INSERT INTO {} ({}) VALUES ({})'.format(table,
-                        ', '.join(columns),
-                        ', '.join(['?' for _ in range(len(row))]))
-                self.__db.put(script, *row)
-        self.__db.commit()
-        self.__db.disconnect()
+        for row in rows:
+            if table == 'notes':
+                script = 'INSERT INTO {} ({}) VALUES ({}, "", "")'.format(table,
+                    ', '.join(columns),
+                    ', '.join(['?' for _ in range(len(row))]))
+            else:
+                script = 'INSERT INTO {} ({}) VALUES ({})'.format(table,
+                    ', '.join(columns),
+                    ', '.join(['?' for _ in range(len(row))]))
+            self.__db.put(script, *row)
 
     def check_rows(self, db, tables_dict):
         """Add rows in updates databases."""
@@ -164,14 +138,14 @@ class DBConverter:
                             db.put(script)
                         db.commit()
 
-    def run(self, tables_dict):
+    def run(self, tables_dict_default, tables_dict):
         """Run convert data from old database to new."""
         try:
             self.__db.connect(self.__db_name + '.db')
             db_ver = self.checker(self.__db, tables_dict)
             self.__db.disconnect()
             for index in range(db_ver-1, tables.VERSION-1):
-                getattr(self, self.__update_functions[index])()
+                self.update_db(index+1, tables_dict_default, getattr(self, self.__update_functions[index]))
         except Exception as e:
             print(e)
             return False

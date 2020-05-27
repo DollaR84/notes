@@ -44,7 +44,7 @@ class Notes:
         if db_ver != tables.VERSION:
             self.db.disconnect()
             message.information(phrases.titles.info, phrases.conv.info % (db_ver, tables.VERSION,))
-            if conv.run(tables_dict):
+            if conv.run(tables.NOTES, tables_dict):
                 message.information(phrases.titles.info, phrases.conv.success % (tables.VERSION,))
             else:
                 message.information(phrases.titles.error, phrases.conv.error)
