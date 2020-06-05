@@ -219,8 +219,9 @@ class Commands:
         wx_tree_id = self.drawer.tree.GetSelection()
         index = self.tree.wx_tree_id2id(wx_tree_id)
         title = event.GetLabel()
-        self.actions.run(SaveTitle(index, title))
-        self.__set_state_undo_menuitem()
+        if title != '':
+            self.actions.run(SaveTitle(index, title))
+            self.__set_state_undo_menuitem()
 
     def text_change(self, event):
         """Change text controls note."""
@@ -237,8 +238,7 @@ class Commands:
     def __check_password(self):
         """Check state readonly password."""
         result = True
-        password_chk = True if self.config.readonly_password_check == "true" else False
-        if password_chk:
+        if self.config.readonly_password_check == "true":
             dlg = PasswordEntryDialog(self.drawer, self.drawer.phrases.titles.password)
             if RetCode.OK == dlg.ShowModal():
                 hashpass= hashlib.sha1(dlg.GetValue().encode("utf-8"))
@@ -247,6 +247,8 @@ class Commands:
             else:
                 result = False
             dlg.Destroy()
+        else:
+            result = False
         return result
 
     def change_readonly(self, event):
