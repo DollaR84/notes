@@ -24,6 +24,10 @@ COLUMNS = {
             ["date_create", "TEXT", "NOT NULL"],
             ["date_update", "TEXT", "NOT NULL"],
         ]),
+        (5, [
+            ["state_check", "INTEGER", "NOT NULL"],
+            ["state", "TEXT", "NOT NULL"],
+        ]),
     ])
 }
 
@@ -33,8 +37,12 @@ ROWS = {
         (3, [
             '4, "readonly_password_check", "false"',
             '5, "readonly_password", ""'
+        ]),
+        (5, [
+            '6, "speech_readonly", "false"',
+            '7, "speech_state", "true"'
         ])
-    ])
+    ]),
 }
 
 

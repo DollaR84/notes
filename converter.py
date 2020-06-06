@@ -30,6 +30,7 @@ class DBConverter:
                                    'update_db2',
                                    'update_db3',
                                    'update_db4',
+                                   'update_db5',
                                   ]
 
     def __get_old_data(self, tables_list):
@@ -51,8 +52,12 @@ class DBConverter:
                     return 2
                 elif ('date_create' in diff_columns) and ('date_update' in diff_columns):
                     return 3
+                elif ('state_check' in diff_columns) and ('state' in diff_columns):
+                    return 4
                 else:
                     pass
+        elif 'states' in diff_tables:
+            return 4
         else:
             pass
         return tables.VERSION
@@ -117,6 +122,19 @@ class DBConverter:
         for row in rows:
             if table == 'notes':
                 script = 'INSERT INTO {} ({}) VALUES ({}, "", "")'.format(table,
+                    ', '.join(columns),
+                    ', '.join(['?' for _ in range(len(row))]))
+            else:
+                script = 'INSERT INTO {} ({}) VALUES ({})'.format(table,
+                    ', '.join(columns),
+                    ', '.join(['?' for _ in range(len(row))]))
+            self.__db.put(script, *row)
+
+    def update_db5(self, table, columns, rows):
+        """Update database tables from version database 4 to version 5."""
+        for row in rows:
+            if table == 'notes':
+                script = 'INSERT INTO {} ({}) VALUES ({}, 0, "")'.format(table,
                     ', '.join(columns),
                     ', '.join(['?' for _ in range(len(row))]))
             else:

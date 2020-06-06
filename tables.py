@@ -8,7 +8,7 @@ Created on 20.04.2020
 """
 
 
-VERSION = 4
+VERSION = 5
 
 
 SETTINGS = {
@@ -23,6 +23,10 @@ SETTINGS = {
         ['py', 'INTEGER', 'NOT NULL'],
         ['sx', 'INTEGER', 'NOT NULL'],
         ['sy', 'INTEGER', 'NOT NULL']
+    ],
+    "states": [
+        ["id", "INTEGER", "PRIMARY KEY", "NOT NULL"],
+        ["state", "TEXT", "NOT NULL"]
     ]
 }
 

@@ -86,6 +86,8 @@ DEFAULT_DATA = {
         '2, "general_language", "ru"',
         '3, "general_expand", "true"'
     ],
+    "states": [
+    ],
 }
 
 
