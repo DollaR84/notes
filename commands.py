@@ -175,8 +175,8 @@ class Commands:
         self.drawer.data.SetValue('')
         self.drawer.data.Disable()
 
-    def tree_select(self, event):
-        """Change select item in tree."""
+    def __tree_select(self):
+        """Change select item in tree with program select."""
         index = self.tree.wx_tree_id2id(self.drawer.tree.GetSelection())
         if index is None:
             self.__set_state_order_menuitem(False)
@@ -208,6 +208,10 @@ class Commands:
             self.drawer.create_child.Enable(True)
         self.drawer.but_save.Disable()
         self.drawer.save_note.Enable(False)
+
+    def tree_select(self, event):
+        """Change select item in tree."""
+        self.__tree_select()
 
     def tree_activated(self, event):
         """Activated edit label on tree item."""
@@ -289,6 +293,7 @@ class Commands:
             self.tree.clear()
             self.init_tree()
             self.drawer.tree.SelectItem(self.tree.id2wx_tree_id(parent_id))
+            self.__tree_select()
 
     def create(self, event):
         """Create new note."""
@@ -302,13 +307,9 @@ class Commands:
         self.drawer.tree.Expand(parent_wx_tree_id)
         self.drawer.tree.SelectItem(wx_tree_id)
         self.tree.add(index, parent_id, wx_tree_id)
-        if not self.drawer.data.IsEnabled():
-            self.drawer.data.Enable()
-        self.drawer.data.SetValue('')
-        self.drawer.but_save.Disable()
-        self.drawer.save_note.Enable(False)
         self.actions.run(CreateNote(index, self.drawer.tree.GetItemText(wx_tree_id)))
         self.__set_state_undo_menuitem()
+        self.__tree_select()
 
     def insert(self, event):
         """Insert new note."""
@@ -327,11 +328,7 @@ class Commands:
             parent_wx_tree_id = self.tree.id2wx_tree_id(parent_id)
             self.drawer.tree.Expand(parent_wx_tree_id)
             self.drawer.tree.SelectItem(self.tree.id2wx_tree_id(index))
-            if not self.drawer.data.IsEnabled():
-                self.drawer.data.Enable()
-            self.drawer.data.SetValue('')
-            self.drawer.but_save.Disable()
-            self.drawer.save_note.Enable(False)
+            self.__tree_select()
 
     def rollback(self, event):
         """Process menu commands undo and redo."""
@@ -350,6 +347,7 @@ class Commands:
         if select is None:
             select = self.tree.id2wx_tree_id(parent)
         self.drawer.tree.SelectItem(select)
+        self.__tree_select()
 
     def order(self, event):
         """Order items."""
@@ -368,6 +366,7 @@ class Commands:
         self.drawer.tree.DeleteAllItems()
         self.init_tree()
         self.drawer.tree.SelectItem(self.tree.id2wx_tree_id(index))
+        self.__tree_select()
 
     def sort(self, event):
         """Sort items."""
@@ -384,6 +383,7 @@ class Commands:
         self.drawer.tree.DeleteAllItems()
         self.init_tree()
         self.drawer.tree.SelectItem(self.tree.id2wx_tree_id(index))
+        self.__tree_select()
 
     def count(self, event):
         """Show information of count notes."""
