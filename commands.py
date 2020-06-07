@@ -202,7 +202,7 @@ class Commands:
             self.drawer.readonly.Enable(True)
             readonly = self.notes.get_readonly(index)
             self.drawer.readonly.SetValue(readonly)
-            self.__set_state_text_note(readonly)
+            self.__set_state_text_note(not readonly)
             self.__set_state_del(not readonly)
             self.drawer.but_create.Enable(True)
             self.drawer.create_child.Enable(True)
@@ -236,9 +236,8 @@ class Commands:
             self.drawer.but_save.Enable()
             self.drawer.save_note.Enable(True)
 
-    def __set_state_text_note(self, readonly):
+    def __set_state_text_note(self, state):
         """Set data text control note readonly state."""
-        state = not readonly
         self.drawer.data.SetEditable(state)
 
     def __check_password(self):
@@ -263,11 +262,11 @@ class Commands:
         readonly = self.drawer.readonly.GetValue()
         if readonly:
             self.notes.save_readonly(index, readonly)
-            self.__set_state_text_note(readonly)
+            self.__set_state_text_note(not readonly)
             self.__set_state_del(not readonly)
         elif self.__check_password():
             self.notes.save_readonly(index, readonly)
-            self.__set_state_text_note(readonly)
+            self.__set_state_text_note(not readonly)
             self.__set_state_del(not readonly)
         else:
             self.drawer.readonly.SetValue(True)
