@@ -65,7 +65,11 @@ class DBConverter:
     def __save_old_db(self, db_name, version):
         """Saving old databases before updates."""
         date = datetime.strftime(datetime.now(), "%d.%m.%Y")
-        os.rename(''.join([db_name, '.db']), ''.join([db_name, '.v{}.'.format(version), date, '.db']))
+        time = datetime.strftime(datetime.now(), "%H.%M.%S")
+        try:
+            os.rename(''.join([db_name, '.db']), ''.join([db_name, '.v{}.'.format(version), date, '.db']))
+        except:
+            os.rename(''.join([db_name, '.db']), ''.join([db_name, '.v{}.'.format(version), date, '.', time, '.db']))
 
     def update_db(self, db_ver, tables_dict_default, update_func):
         """Run update database tables."""
@@ -75,12 +79,13 @@ class DBConverter:
         self.__save_old_db(self.__db_name, db_ver)
         self.__db.connect(self.__db_name + '.db')
         tables_dict = deepcopy(tables_dict_default)
-        for table, rows in self.__old_data.items():
+        for table in tables_dict.keys():
             tables_dict[table].extend(updates.columns_all(table, db_ver+1))
             script = 'CREATE TABLE {} ({}) WITHOUT ROWID'.format(table,
                 ', '.join([' '.join(row) for row in tables_dict[table]]))
             self.__db.put(script)
             columns = tables.get_columns_names(tables_dict[table])
+            rows = self.__old_data.get(table, [])
             update_func(table, columns, rows)
         self.__db.commit()
         self.__db.disconnect()
