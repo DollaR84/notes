@@ -204,6 +204,8 @@ class Commands:
             self.drawer.readonly.SetValue(readonly)
             self.__set_state_text_note(readonly)
             self.__set_state_del(not readonly)
+            self.drawer.but_create.Enable(True)
+            self.drawer.create_child.Enable(True)
         self.drawer.but_save.Disable()
         self.drawer.save_note.Enable(False)
 
