@@ -92,7 +92,7 @@ class Notes:
         """Create new row in database."""
         date = datetime.strftime(datetime.now(), "%d.%m.%Y")
         columns = self.db.get_columns_names('notes')
-        script = 'INSERT INTO notes ({}) VALUES (?, ?, "", ?, ?, 0, ?, ?)'.format(', '.join(columns))
+        script = 'INSERT INTO notes ({}) VALUES (?, ?, "", ?, ?, 0, ?, ?, 0, "")'.format(', '.join(columns))
         self.db.put(script, index, title, parent_id, order_id, date, date)
         self.db.commit()
 
