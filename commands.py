@@ -14,6 +14,7 @@ import webbrowser
 
 from actions.actions import Actions
 from actions.main import CreateNote, InsertNote, SaveTitle, SaveNote, DelNote
+from actions.extend import SetReadonly, SetStateCheck, SetState
 from actions.order import OrderUp, OrderDown, OrderParentUp, OrderParentDown
 from actions.sort import SortTitle, SortChildCountUp, SortChildCountDown
 
@@ -171,9 +172,11 @@ class Commands:
     def __disable_widgets(self):
         """Disable state for all widgets."""
         self.__set_state_del(False)
-        self.drawer.readonly.Enable(False)
         self.drawer.data.SetValue('')
         self.drawer.data.Disable()
+        self.drawer.readonly.Enable(False)
+        self.drawer.state_check.Enable(False)
+        self.drawer.states.Enable(False)
 
     def __tree_select(self):
         """Change select item in tree with program select."""
@@ -204,6 +207,11 @@ class Commands:
             self.drawer.readonly.SetValue(readonly)
             self.__set_state_text_note(not readonly)
             self.__set_state_del(not readonly)
+            self.drawer.state_check.Enable(True)
+            state_check = self.notes.get_state_check(index)
+            self.drawer.state_check.SetValue(state_check)
+            self.drawer.states.Enable(state_check)
+            self.__set_state(index)
             self.drawer.but_create.Enable(True)
             self.drawer.create_child.Enable(True)
         self.drawer.but_save.Disable()
@@ -261,15 +269,39 @@ class Commands:
         index = self.tree.wx_tree_id2id(self.drawer.tree.GetSelection())
         readonly = self.drawer.readonly.GetValue()
         if readonly:
-            self.notes.save_readonly(index, readonly)
+            self.actions.run(SetReadonly(index, readonly))
             self.__set_state_text_note(not readonly)
             self.__set_state_del(not readonly)
         elif self.__check_password():
-            self.notes.save_readonly(index, readonly)
+            self.actions.run(SetReadonly(index, readonly))
             self.__set_state_text_note(not readonly)
             self.__set_state_del(not readonly)
         else:
             self.drawer.readonly.SetValue(True)
+        self.__set_state_undo_menuitem()
+
+    def change_state(self, event):
+        """Change state attribute for note."""
+        index = self.tree.wx_tree_id2id(self.drawer.tree.GetSelection())
+        state_check = self.drawer.state_check.GetValue()
+        self.actions.run(SetStateCheck(index, state_check))
+        self.drawer.states.Enable(state_check)
+        self.__set_state_undo_menuitem()
+
+    def choice_state(self, event):
+        """Set state for note."""
+        index = self.tree.wx_tree_id2id(self.drawer.tree.GetSelection())
+        state = self.drawer.states.GetString(self.drawer.states.GetSelection())
+        self.actions.run(SetState(index, state))
+        self.__set_state_undo_menuitem()
+
+    def __set_state(self, index):
+        """Set string in choice states."""
+        state = self.notes.get_state(index)
+        select = self.drawer.states.FindString(state)
+        if select == self.drawer.get_not_found():
+            select = 0
+        self.drawer.states.SetSelection(select)
 
     def save(self, event):
         """Save data note in database."""

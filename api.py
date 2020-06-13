@@ -88,6 +88,18 @@ class Notes:
         row = self.db.get(script, index)
         return bool(row[0][0])
 
+    def get_state_check(self, index):
+        """Return note state_check attribute from database."""
+        script = 'SELECT state_check FROM notes WHERE id=?'
+        row = self.db.get(script, index)
+        return bool(row[0][0])
+
+    def get_state(self, index):
+        """Return note state string from database."""
+        script = 'SELECT state FROM notes WHERE id=?'
+        row = self.db.get(script, index)
+        return row[0][0]
+
     def create(self, index, title, parent_id, order_id):
         """Create new row in database."""
         date = datetime.strftime(datetime.now(), "%d.%m.%Y")
@@ -115,6 +127,20 @@ class Notes:
         script = 'UPDATE notes SET readonly=? WHERE id=?'
         value = 1 if state else 0
         self.db.put(script, value, index)
+        self.db.commit()
+
+    def save_state_check(self, index, state):
+        """Save state_check attribute note in database."""
+        script = 'UPDATE notes SET state_check=? WHERE id=?'
+        value = 1 if state else 0
+        self.db.put(script, value, index)
+        self.db.commit()
+
+    def save_state(self, index, state):
+        """Save state string note in database."""
+        date = datetime.strftime(datetime.now(), "%d.%m.%Y")
+        script = 'UPDATE notes SET state=?, date_update=? WHERE id=?'
+        self.db.put(script, state, date, index)
         self.db.commit()
 
     def del_note(self, index):
