@@ -114,3 +114,7 @@ class NotesFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, getattr(self.command, 'save'), self.but_save)
         self.Bind(wx.EVT_BUTTON, getattr(self.command, 'delete'), self.but_del)
         self.Bind(wx.EVT_BUTTON, getattr(self.command, 'create'), self.but_create)
+
+    def get_not_found(self):
+        """Return wx.NOT_FOUND value."""
+        return wx.NOT_FOUND
