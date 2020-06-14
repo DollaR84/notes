@@ -3,10 +3,12 @@ pyinstaller -F --noconsole -n notes ^
 --add-binary actions/base.pyd;actions ^
 --add-binary actions/history.pyd;actions ^
 --add-binary actions/main.pyd;actions ^
+--add-binary actions/extend.pyd;actions ^
 --add-binary actions/order.pyd;actions ^
 --add-binary actions/sort.pyd;actions ^
 --add-binary dialogs/dialogs.pyd;dialogs ^
 --add-binary dialogs/options.pyd;dialogs ^
+--add-binary accessible.pyd;. ^
 --add-binary api.pyd;. ^
 --add-binary commands.pyd;. ^
 --add-binary configs.pyd;. ^
