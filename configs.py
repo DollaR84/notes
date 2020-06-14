@@ -56,6 +56,29 @@ class Config(WXDB):
         with open('languages.dat', 'rb') as lang_file:
             return pickle.load(lang_file)[code]
 
+    def get_states(self, states_default):
+        """Return list states."""
+        states = ['']
+        states.extend(states_default)
+        states.extend(self.get_user_states())
+        return states
+
+    def get_user_states(self):
+        """Return list user states."""
+        script = 'SELECT * FROM states'
+        data = self.db.get(script)
+        return [row[1] for row in data]
+
+    def save_user_states(self, states):
+        """Save list user states to database."""
+        script = 'DELETE FROM states'
+        self.db.put(script)
+        for index, state in enumerate(states, 1):
+            script = '''INSERT INTO states (id, state)
+                        VALUES (?, ?)'''
+            self.db.put(script, index, state)
+        self.db.commit()
+
     def open_settings(self, parent):
         """Open settings dialog."""
         result = False
@@ -63,6 +86,7 @@ class Config(WXDB):
         if RetCode.OK == dlg.ShowModal():
             dlg.config.pop('donate_url')
             dlg.config.pop('languages')
+            self.save_user_states(dlg.config.pop('states'))
             for key, value in dlg.config.items():
                 if key == '__languages':
                     continue

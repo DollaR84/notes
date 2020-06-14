@@ -437,4 +437,9 @@ class Commands:
     def options(self, event):
         """Run settings dialog."""
         if self.config.open_settings(self.drawer):
+            self.drawer.states.Set(self.config.get_states(self.phrases.widgets.states))
+            index = self.tree.wx_tree_id2id(self.drawer.tree.GetSelection())
+            self.drawer.Layout()
+            state = self.notes.get_state(index)
+            self.drawer.states.SetSelection(self.drawer.states.FindString(state))
             self.message.information(self.phrases.titles.info, self.phrases.info.need_restart)
