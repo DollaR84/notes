@@ -19,7 +19,7 @@ class SortTitle(BaseAction):
         items = {}
         titles = {}
         for key in list(self.__order_dict.keys()):
-            titles[key] = notes.get_note(key)[0]
+            titles[key] = notes.get_title(key)
         order_id = [item[0] for item in sorted(list(titles.items()), key=lambda i: i[1])]
         for i, index in enumerate(order_id, 1):
             items[index] = (self.index, i)
@@ -63,6 +63,48 @@ class SortChildCountDown(BaseAction):
         for key in list(self.__order_dict.keys()):
             childs[key] = tree.get_count_childs(key)
         order_id = list(reversed([item[0] for item in sorted(list(childs.items()), key=lambda i: i[1])]))
+        for i, index in enumerate(order_id, 1):
+            items[index] = (self.index, i)
+        notes.update(items)
+
+    def undo(self, tree, notes):
+        """Run undo action."""
+        items = {index: (self.index, order_sort) for index, order_sort in self.__order_dict.items()}
+        notes.update(items)
+
+
+class SortStateUp(BaseAction):
+    """Action sort by states up parent childs."""
+
+    def run(self, tree, notes):
+        """Running action."""
+        self.__order_dict = notes.get_order(self.index)
+        items = {}
+        states = {}
+        for key in list(self.__order_dict.keys()):
+            states[key] = notes.get_state(key)
+        order_id = [item[0] for item in sorted(list(states.items()), key=lambda i: i[1])]
+        for i, index in enumerate(order_id, 1):
+            items[index] = (self.index, i)
+        notes.update(items)
+
+    def undo(self, tree, notes):
+        """Run undo action."""
+        items = {index: (self.index, order_sort) for index, order_sort in self.__order_dict.items()}
+        notes.update(items)
+
+
+class SortStateDown(BaseAction):
+    """Action sort by states down parent childs."""
+
+    def run(self, tree, notes):
+        """Running action."""
+        self.__order_dict = notes.get_order(self.index)
+        items = {}
+        states = {}
+        for key in list(self.__order_dict.keys()):
+            states[key] = notes.get_state(key)
+        order_id = list(reversed([item[0] for item in sorted(list(states.items()), key=lambda i: i[1])]))
         for i, index in enumerate(order_id, 1):
             items[index] = (self.index, i)
         notes.update(items)

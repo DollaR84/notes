@@ -34,6 +34,8 @@ class Menu:
         self.drawer.sort_titles.Enable(False)
         self.drawer.sort_childcount_up.Enable(False)
         self.drawer.sort_childcount_down.Enable(False)
+        self.drawer.sort_state_up.Enable(False)
+        self.drawer.sort_state_down.Enable(False)
         self.drawer.info_date.Enable(False)
 
     def __create_menu(self):
@@ -66,6 +68,10 @@ class Menu:
         self.drawer.sort_childcount_up = menu_sort_child.Append(-1, self.phrases.menu.edit.items.sort.items.child.items.up.name, self.phrases.menu.edit.items.sort.items.child.items.up.help)
         self.drawer.sort_childcount_down = menu_sort_child.Append(-1, self.phrases.menu.edit.items.sort.items.child.items.down.name, self.phrases.menu.edit.items.sort.items.child.items.down.help)
         menu_sort.Append(-1, self.phrases.menu.edit.items.sort.items.child.title, menu_sort_child)
+        menu_sort_state = wx.Menu()
+        self.drawer.sort_state_up = menu_sort_state.Append(-1, self.phrases.menu.edit.items.sort.items.state.items.up.name, self.phrases.menu.edit.items.sort.items.state.items.up.help)
+        self.drawer.sort_state_down = menu_sort_state.Append(-1, self.phrases.menu.edit.items.sort.items.state.items.down.name, self.phrases.menu.edit.items.sort.items.state.items.down.help)
+        menu_sort.Append(-1, self.phrases.menu.edit.items.sort.items.state.title, menu_sort_state)
         menu_edit.Append(-1, self.phrases.menu.edit.items.sort.title, menu_sort)
 
         menu_info = wx.Menu()
@@ -125,6 +131,8 @@ class Menu:
         self.drawer.Bind(wx.EVT_MENU, getattr(self.command, 'sort'), self.drawer.sort_titles)
         self.drawer.Bind(wx.EVT_MENU, getattr(self.command, 'sort'), self.drawer.sort_childcount_up)
         self.drawer.Bind(wx.EVT_MENU, getattr(self.command, 'sort'), self.drawer.sort_childcount_down)
+        self.drawer.Bind(wx.EVT_MENU, getattr(self.command, 'sort'), self.drawer.sort_state_up)
+        self.drawer.Bind(wx.EVT_MENU, getattr(self.command, 'sort'), self.drawer.sort_state_down)
         self.drawer.Bind(wx.EVT_MENU, getattr(self.command, 'count'), self.drawer.count_root)
         self.drawer.Bind(wx.EVT_MENU, getattr(self.command, 'count'), self.drawer.count_child)
         self.drawer.Bind(wx.EVT_MENU, getattr(self.command, 'count'), self.drawer.count_total)

@@ -16,7 +16,7 @@ from actions.actions import Actions
 from actions.main import CreateNote, InsertNote, SaveTitle, SaveNote, DelNote
 from actions.extend import SetReadonly, SetStateCheck, SetState
 from actions.order import OrderUp, OrderDown, OrderParentUp, OrderParentDown
-from actions.sort import SortTitle, SortChildCountUp, SortChildCountDown
+from actions.sort import SortTitle, SortChildCountUp, SortChildCountDown, SortStateUp, SortStateDown
 
 from api import Notes
 
@@ -152,6 +152,8 @@ class Commands:
         self.drawer.sort_titles.Enable(state)
         self.drawer.sort_childcount_up.Enable(state)
         self.drawer.sort_childcount_down.Enable(state)
+        self.drawer.sort_state_up.Enable(state)
+        self.drawer.sort_state_down.Enable(state)
 
     def __set_state_undo_menuitem(self):
         """Set menu items undo and redo."""
@@ -408,6 +410,10 @@ class Commands:
             self.actions.run(SortChildCountUp(index))
         elif event.GetId() == self.drawer.sort_childcount_down.GetId():
             self.actions.run(SortChildCountDown(index))
+        elif event.GetId() == self.drawer.sort_state_up.GetId():
+            self.actions.run(SortStateUp(index))
+        elif event.GetId() == self.drawer.sort_state_down.GetId():
+            self.actions.run(SortStateDown(index))
         self.__set_state_undo_menuitem()
         self.expand_tree_save()
         self.tree.clear()
