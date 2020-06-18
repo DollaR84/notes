@@ -226,7 +226,10 @@ class Commands:
     def tree_activated(self, event):
         """Activated edit label on tree item."""
         index = self.tree.wx_tree_id2id(self.drawer.tree.GetSelection())
-        readonly = True if self.drawer.readonly.GetValue() and (not self.__check_password()) else False
+        readonly = self.drawer.readonly.GetValue()
+        if readonly:
+            if (self.config.readonly_password_check == "true") and self.__check_password():
+                readonly = False
         if (index != 0) and (not readonly):
             self.drawer.tree.EditLabel(event.GetItem())
 
@@ -252,32 +255,31 @@ class Commands:
 
     def __check_password(self):
         """Check state readonly password."""
-        result = True
-        if self.config.readonly_password_check == "true":
-            dlg = PasswordEntryDialog(self.drawer, self.drawer.phrases.titles.password)
-            if RetCode.OK == dlg.ShowModal():
-                hashpass= hashlib.sha1(dlg.GetValue().encode("utf-8"))
-                if hashpass.hexdigest() != self.config.readonly_password:
-                    result = False
-            else:
-                result = False
-            dlg.Destroy()
-        else:
-            result = False
+        result = False
+        dlg = PasswordEntryDialog(self.drawer, self.drawer.phrases.titles.password)
+        if RetCode.OK == dlg.ShowModal():
+            hashpass= hashlib.sha1(dlg.GetValue().encode("utf-8"))
+            if hashpass.hexdigest() == self.config.readonly_password:
+                result = True
+        dlg.Destroy()
         return result
+
+    def __change_readonly(self, index, readonly):
+        """Change readonly attribute for widgets."""
+        self.actions.run(SetReadonly(index, readonly))
+        self.__set_state_text_note(not readonly)
+        self.__set_state_del(not readonly)
 
     def change_readonly(self, event):
         """Change readonly attribute for note."""
         index = self.tree.wx_tree_id2id(self.drawer.tree.GetSelection())
         readonly = self.drawer.readonly.GetValue()
         if readonly:
-            self.actions.run(SetReadonly(index, readonly))
-            self.__set_state_text_note(not readonly)
-            self.__set_state_del(not readonly)
+            self.__change_readonly(index, readonly)
+        elif self.config.readonly_password_check != "true":
+            self.__change_readonly(index, readonly)
         elif self.__check_password():
-            self.actions.run(SetReadonly(index, readonly))
-            self.__set_state_text_note(not readonly)
-            self.__set_state_del(not readonly)
+            self.__change_readonly(index, readonly)
         else:
             self.drawer.readonly.SetValue(True)
         self.__set_state_undo_menuitem()
